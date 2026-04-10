@@ -205,13 +205,13 @@ function mac_render_pricing_card($plan, $period, $layout = 'slider')
  */
 function mac_fetch_pricing_data()
 {
-    // Check for cached data (cache for 1 hour)
-    $cache_key = 'mac_pricing_data';
-    $cached_data = get_transient($cache_key);
-
-    if (false !== $cached_data) {
-        return $cached_data;
-    }
+//    // Check for cached data (cache for 1 hour)
+//    $cache_key = 'mac_pricing_data';
+//    $cached_data = get_transient($cache_key);
+//
+//    if (false !== $cached_data) {
+//        return $cached_data;
+//    }
 
     // Fetch from API
     $api_url = BASE_API . '/billing/public/tiers/?page=1&page_size=1000';
@@ -237,9 +237,6 @@ function mac_fetch_pricing_data()
 
     // Transform API data to our format
     $transformed_data = mac_transform_pricing_data($data['results']);
-
-    // Cache for 1 hour
-    set_transient($cache_key, $transformed_data, HOUR_IN_SECONDS);
 
     return $transformed_data;
 }

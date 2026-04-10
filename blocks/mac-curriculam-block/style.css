@@ -1,3 +1,15 @@
+a.curriculum-card-link {
+    text-decoration: none;
+}
+
+.filter-options {
+    display: none;
+}
+
+.filter-options.open {
+    display: flex;
+}
+
 .mac-curriculum-wrapper {
     font-family: "Inter Tight", sans-serif;
 }
@@ -60,6 +72,7 @@
     border: none;
     border-radius: 4px;
     position: absolute;
+    top: 6px;
     right: 6px;
     cursor: pointer;
     transition: background 0.3s;
@@ -151,6 +164,28 @@
     width: 16px;
     height: 16px;
     cursor: pointer;
+    accent-color: #0D0D0D;
+}
+
+.filter-options .filter-show-more {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 22px;
+    color: #0d0d0d;
+    display: inline-flex;
+    text-decoration: underline;
+    white-space: nowrap;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    background: none;
+    margin-top: 6px;
+    font-family: "Inter Tight" !important;
+    transition: 0.3s;
+}
+
+.filter-options .filter-show-more:hover {
+    color: #737373;
 }
 
 /* Active Filters */
@@ -215,7 +250,6 @@
 }
 
 .curriculum-card {
-    border-radius: 8px;
     overflow: hidden;
     transition: transform 0.3s, box-shadow 0.3s;
 }
@@ -223,15 +257,25 @@
 .card-image {
     position: relative;
     overflow: hidden;
+    border-radius: 8px;
+    line-height: 0;
+    height: 228px;
 }
 
 .card-image img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transform: scale(1);
+    transition: all 0.3s ease;
+}
+
+.card-image:hover img {
+    transform: scale(1.1);
 }
 
 .card-badge {
+    font-family: 'Inter Tight';
     font-size: 12px;
     font-weight: 500;
     line-height: 14px;
@@ -265,6 +309,7 @@
     align-items: center;
     justify-content: space-between;
     margin-bottom: 24px;
+    gap: 8px;
 }
 
 .section-header h6 {
@@ -291,6 +336,7 @@
     align-items: center;
     justify-content: center;
 }
+
 .section-header .see-all {
     font-size: 16px;
     font-weight: 500;
@@ -300,6 +346,12 @@
     align-items: center;
     gap: 4px;
     font-family: 'Inter Tight';
+    text-decoration: none !important;
+    white-space: nowrap;
+}
+
+.section-header .see-all:hover {
+    text-decoration: none;
 }
 
 .section-grid {
@@ -311,6 +363,7 @@
 .author-avatar {
     width: 24px;
     height: 24px;
+    background: #ddd;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -323,20 +376,17 @@
     font-size: 16px;
     font-weight: 600;
     line-height: 22px;
-}
-
-.card-title a {
-    font-family: inherit;
     color: #0D0D0D;
     text-decoration: none;
     transition: color 0.2s;
 }
 
-.card-title a:hover {
+.card-title:hover {
     color: #666;
 }
 
 .card-tags {
+    font-family: 'Inter Tight';
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
@@ -352,14 +402,6 @@
     border-radius: 12px;
 }
 
-/* Loading State */
-.curriculum-loading {
-    text-align: center;
-    padding: 40px;
-    font-size: 16px;
-    color: #666;
-}
-
 /* No Results */
 .no-results {
     grid-column: 1 / -1;
@@ -373,55 +415,151 @@
     margin: 0;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-    .curriculum-content {
-        grid-template-columns: 1fr;
+/* Skeleton Loader Styles */
+.curriculum-loading {
+    /* display: none; */
+    margin-top: -15px;
+}
+
+.skeleton-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.skeleton-pill {
+    height: 32px;
+    width: 120px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeleton-section {
+    margin-bottom: 40px;
+}
+
+.skeleton-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.skeleton-title {
+    height: 28px;
+    width: 200px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+.skeleton-link {
+    height: 20px;
+    width: 80px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+/* Match your actual .section-grid structure */
+.skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.skeleton-card {
+    overflow: hidden;
+}
+
+.skeleton-image {
+    width: 100%;
+    height: 229px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+
+/* Match your .card-title structure */
+.skeleton-text-title {
+    height: 22px;
+    /* Matches line-height from .card-title */
+    width: 85%;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    margin: 16px 0 12px 0;
+    /* Matches margin from .card-title */
+}
+
+/* Match your .card-tags structure */
+.skeleton-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    /* Matches gap from .card-tags */
+}
+
+/* Match your .tag structure */
+.skeleton-tag {
+    height: 22px;
+    /* 14px line-height + 8px padding (4px top + 4px bottom) */
+    width: 60px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 12px;
+    /* Matches border-radius from .tag */
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
     }
 
-    .curriculum-sidebar {
-        position: static;
-    }
-
-    .curriculum-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    100% {
+        background-position: 200% 0;
     }
 }
 
-@media (max-width: 768px) {
-    .curriculum-header {
-        flex-direction: column;
-        align-items: flex-start;
+/* Responsive adjustments to match your grid */
+@media (max-width: 1024px) {
+
+    .skeleton-grid,
+    .section-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 
-    .curriculum-search {
-        width: 100%;
+    .curriculum-content {
+        grid-template-columns: 250px 1fr;
+        gap: 32px;
+    }
+}
+
+/* <= 768px */
+@media (max-width: 767px) {
+
+    .skeleton-grid,
+    .section-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+
+    .curriculum-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
     }
 
     #curriculum-search-input {
-        min-width: 0;
-        flex: 1;
-    }
-
-    .curriculum-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-@media (max-width: 480px) {
-    .mac-curriculum-wrapper {
-        padding: 15px;
-    }
-
-    .curriculum-header h2 {
-        font-size: 24px;
+        min-width: auto;
     }
 
     .curriculum-sidebar {
-        padding: 15px;
-    }
-
-    .card-content {
-        padding: 15px;
+        position: relative;
+        top: 0;
     }
 }
