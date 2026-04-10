@@ -1,131 +1,106 @@
-/* Carousel Container */
-.mac-carousel-wrap {
-    padding: 50px 0;
-    overflow: hidden;
+/* Mac Resource Carousel Styles */
+.mac-resource-carousel-wrapper {
     width: 100%;
+    overflow: hidden;
 }
 
-.mac-carousel {
+.carousel {
+    width: 100vw;
+    height: 85vh;
+    min-height: 500px;
     display: flex;
-    justify-content: flex-start;
     align-items: center;
-    gap: 20px;
-    position: relative;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-behavior: smooth;
-    padding: 20px 50%;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-}
-
-.mac-carousel::-webkit-scrollbar {
-    display: none;
-}
-
-/* Slides */
-.mac-slide {
-    position: relative;
-    min-width: 200px;
-    width: 200px;
-    height: 250px;
-    flex-shrink: 0;
-    border-radius: 10px;
+    justify-content: center;
     overflow: hidden;
-    transition: all 0.4s ease;
-    transform: scale(0.8);
-    opacity: 0.6;
-    scroll-snap-align: center;
 }
 
-.mac-slide img {
+.carousel-track {
+    position: relative;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    cursor: grab;
 }
 
-/* Middle Active Slide - Boro */
-.mac-slide.active {
-    transform: scale(1.2);
-    opacity: 1;
-    z-index: 10;
+.carousel-track:active {
+    cursor: grabbing;
 }
 
-/* Left and Right Side Overlay */
-.mac-slide:not(.active)::after {
-    content: '';
+.carousel-slide {
     position: absolute;
-    top: 0;
-    left: 0;
+    width: var(--card-width, 300px);
+    aspect-ratio: 1;
+    height: auto;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    transform: translate(-50%, -50%) translate3d(var(--x), var(--y), 0)
+    rotate(var(--rotate));
+    will-change: transform;
+}
+
+.carousel-slide img {
     width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.3);
+    flex: 1;
+    min-height: 0;
+    object-fit: cover;
+    border-radius: 12px;
     pointer-events: none;
 }
 
-/* Hover Effect */
-.mac-slide:hover {
+.slide-button {
+    padding: 16px 32px;
+    background: rgb(210, 210, 210);
+    color: rgb(54, 54, 54);
+    border: none;
+    border-radius: 100px;
     cursor: pointer;
-    opacity: 1;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-top: 15px;
+    opacity: var(--btn-opacity, 0);
+    transition: opacity 0.1s linear;
+    text-decoration: none;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.slide-button:hover {
+    background: rgb(190, 190, 190);
 }
 
 /* Editor Styles */
-.mac-carousel-editor {
-    padding: 20px;
-    background: #f5f5f5;
-    border-radius: 8px;
+.mac-resource-carousel-editor {
+    min-height: 200px;
 }
 
-.mac-carousel-images {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.mac-carousel-image {
-    position: relative;
-    aspect-ratio: 4/5;
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.mac-carousel-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.remove-btn {
-    position: absolute !important;
-    top: 5px !important;
-    right: 5px !important;
-    width: 25px !important;
-    height: 25px !important;
-    min-width: 25px !important;
-    padding: 0 !important;
-    background: #dc2626 !important;
-    color: white !important;
-    border-radius: 50% !important;
-    font-size: 18px !important;
-    line-height: 1 !important;
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-
-.mac-carousel-image:hover .remove-btn {
-    opacity: 1;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .mac-slide {
-        min-width: 150px;
-        width: 150px;
-        height: 200px;
+@media screen and (max-width: 1366px) {
+    .carousel {
+        height: 75vh;
     }
-    
-    .mac-carousel {
-        gap: 15px;
+}
+
+@media screen and (max-width: 1024px) {
+    .carousel {
+        height: 60vh;
+        min-height: 400px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .carousel {
+        height: 50vh;
+        min-height: 350px;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .slide-button {
+        padding: 12px 24px;
+    }
+
+    .carousel-slide {
+        aspect-ratio: unset;
     }
 }

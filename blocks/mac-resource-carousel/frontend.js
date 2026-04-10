@@ -67,7 +67,7 @@
             let cardWidth, cardHeight;
 
             if (width >= 1024) {
-                cardWidth = Math.min(600, width * 0.35);
+                cardWidth = Math.min(450, width * 0.35);
                 cardHeight = height * 0.7;
                 state.itemSpacing = cardWidth * 1.5;
                 CONFIG.radius = 2800;

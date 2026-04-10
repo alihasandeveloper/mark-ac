@@ -1418,7 +1418,7 @@
           mass: 2.2,
           stiffness: 0.09,
           damping: 0.75,
-          baseRadius: 200,
+          baseRadius: 150,
           intensity: 0.8,
           falloffPower: 1.4,
         };
