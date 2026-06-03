@@ -1,0 +1,184 @@
+/**
+ * Theme Name:     Frontis Child
+ * Author:         WP Messiah
+ * Template:       frontis
+ * Text Domain:	   frontis-child
+ * Description:    Meet Frontis, the lightweight WordPress block theme built for speed and flexibility. Perfect for any project, Frontis offers unlimited customizability through its simple block editor, empowering you to create stunning, fast-loading websites with no hassle. Whether for a blog, business, or portfolio, Frontis provides a robust foundation that scales with your needs, while maintaining great SEO performance. Make a bold statement with Frontis, where speed meets sophistication. A Fast, Highly Customizable Block Theme for WordPress.
+ */
+/* Animation Base Classes */
+.animate-on-scroll {
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Fade Animations */
+.fade-up {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.fade-up.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.fade-down {
+    opacity: 0;
+    transform: translateY(-60px);
+}
+
+.fade-down.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.fade-left {
+    opacity: 0;
+    transform: translateX(60px);
+}
+
+.fade-left.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.fade-right {
+    opacity: 0;
+    transform: translateX(-60px);
+}
+
+.fade-right.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Scale Animations */
+.scale-up {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.scale-up.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.scale-down {
+    opacity: 0;
+    transform: scale(1.2);
+}
+
+.scale-down.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Rotate Animations */
+.rotate-in {
+    opacity: 0;
+    transform: rotate(-10deg) scale(0.9);
+}
+
+.rotate-in.active {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+}
+
+/* Blur Animations */
+.blur-in {
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(30px);
+}
+
+.blur-in.active {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+}
+
+/* Parallax Effect */
+.parallax-slow {
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.parallax-medium {
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.parallax-fast {
+    transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Hover Follow Cursor Animation */
+.hover-follow {
+    /* transition: transform 0.08s cubic-bezier(0.23, 1, 0.32, 1); */
+    cursor: pointer;
+}
+
+/* Delay Classes */
+.delay-100 {
+    transition-delay: 0.1s;
+}
+
+.delay-200 {
+    transition-delay: 0.2s;
+}
+
+.delay-300 {
+    transition-delay: 0.3s;
+}
+
+.delay-400 {
+    transition-delay: 0.4s;
+}
+
+.delay-500 {
+    transition-delay: 0.5s;
+}
+
+.delay-600 {
+    transition-delay: 0.6s;
+}
+
+/* Duration Classes */
+.duration-fast {
+    transition-duration: 0.4s;
+}
+
+.duration-normal {
+    transition-duration: 0.8s;
+}
+
+.duration-slow {
+    transition-duration: 1.2s;
+}
+.mark-hero-section-wrapper .fb-advanced-heading div{
+    transform: scaleY(0);
+}
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    50% {
+        transform: translateX(-50%) translateY(-10px);
+    }
+}
+
+.mark-resource-heading-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.mark-rotating-wrapper {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.mark-rotating-text {
+  display: inline-block;
+}
+
+
