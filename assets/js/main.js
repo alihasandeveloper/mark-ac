@@ -31,8 +31,8 @@
   // Check if we're in a browser environment
   if (typeof window === "undefined") {
     return {
-      initialize: function () {},
-      cleanup: function () {},
+      initialize: function () { },
+      cleanup: function () { },
     };
   }
 
@@ -1159,30 +1159,28 @@
                                 loading="lazy"
                                 onerror="this.src='https://placehold.co/305x229?text=Image+Error'"
                             >
-                            ${
-                              firstCollection
-                                ? `<span class="card-badge">${this.escapeHtml(firstCollection.title)}</span>`
-                                : ""
-                            }
+                            ${firstCollection
+          ? `<span class="card-badge">${this.escapeHtml(firstCollection.title)}</span>`
+          : ""
+        }
                         </div>
                         <div class="card-content">
                             <h3 class="card-title">
                                 ${this.escapeHtml(course.title)}
                             </h3>
-                            ${
-                              displayTags.length > 0
-                                ? `
+                            ${displayTags.length > 0
+          ? `
                             <div class="card-tags" role="list">
                                 ${displayTags
-                                  .map(
-                                    (tag) =>
-                                      `<span class="tag" role="listitem">${this.escapeHtml(tag.title)}</span>`,
-                                  )
-                                  .join("")}
+            .map(
+              (tag) =>
+                `<span class="tag" role="listitem">${this.escapeHtml(tag.title)}</span>`,
+            )
+            .join("")}
                             </div>
                             `
-                                : ""
-                            }
+          : ""
+        }
                         </div>
                     </div>
                 </a>
@@ -1596,7 +1594,7 @@
       return null;
     }
 
-    const words = ["Wise", "Bold", "Rooted", "Spirit-led"];
+    const words = ["Rooted", "Bold", "Spirit-led", "Lifelong", "Prayerful"];
     const wrapper = document.querySelector(".mark-rotating-wrapper");
     const text = document.querySelector(".mark-rotating-text");
 
@@ -2172,14 +2170,13 @@
       return `
                 <div class="pricing-card" data-tier-id="${this.escapeHtml(sub.id)}">
                     <div class="pricing-card-image-wrapper">
-                        ${
-                          imgUrl
-                            ? `
+                        ${imgUrl
+          ? `
                             <img src="${this.escapeHtml(imgUrl)}" 
                                  alt="${this.escapeHtml(tier.title)}" 
                                  class="pricing-card-image">
                         `
-                            : `
+          : `
                             <div class="pricing-card-placeholder">
                                 <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
                                     <rect width="80" height="80" fill="#e0e0e0"/>
@@ -2188,24 +2185,23 @@
                                 </svg>
                             </div>
                         `
-                        }
+        }
                     </div>
                     <div class="pricing-card-content">
                         <h3 class="pricing-card-title">${this.escapeHtml(tier.title)}</h3>
                         <div class="pricing-card-price">
-                            ${
-                              parseFloat(sub.price) === 0.0
-                                ? `
+                            ${parseFloat(sub.price) === 0.0
+          ? `
                                 <span class="price-free">00.00</span>
                             `
-                                : `
+          : `
                                 <h5>
                                     <span class="price-currency">${sub.currency === "USD" ? "$" : this.escapeHtml(sub.currency)}</span>
                                     <span class="price-amount">${Math.floor(sub.price)}</span>
                                     <span class="price-interval">/${periodLabel}</span>
                                 </h5>
                             `
-                            }
+        }
                         </div>
                         ${this.renderSubscriptionFeatures(features)}
                         <a href="/checkout?subscription=${this.escapeHtml(sub.id)}" 

@@ -87,7 +87,7 @@ function frontis_child_style()
  */
 require_once get_stylesheet_directory() . '/inc/custom-blocks.php';
 
-define('WP_NEXT_APP_URL', 'https://mac-dev-customer.boomdevs.net');
+define('WP_NEXT_APP_URL', 'https://markandrewscreative.com');
 
 
 add_action('init', function () {
