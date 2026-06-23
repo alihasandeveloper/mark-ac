@@ -128,6 +128,11 @@ function mac_render_curriculum_products_block($attributes)
                 </h6>
             </div>
 
+            <div class="mac-pricing-tabs">
+                <button class="mac-pricing-tab active" data-period="month">Monthly</button>
+                <button class="mac-pricing-tab" data-period="year">Yearly</button>
+            </div>
+
             <div class="mac-subscription-grid">
                 <!-- Subscriptions will be rendered here by JavaScript -->
             </div>

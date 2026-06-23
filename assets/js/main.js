@@ -1919,6 +1919,8 @@
       this.isInitialized = false;
       this.courseId = "";
       this.courseScope = "";
+      this.subscriptions = [];
+      this.activePeriod = "month";
     }
 
     init() {
@@ -1951,6 +1953,9 @@
 
       // Update subheading
       this.updateSubheading(params.get("selected"));
+
+      // Setup pricing tab listeners
+      this.setupTabListeners();
 
       // Load products and subscriptions
       await this.loadData();
@@ -2008,6 +2013,7 @@
 
         // Render subscriptions
         if (subscriptions && subscriptions.length > 0) {
+          this.subscriptions = subscriptions;
           this.renderSubscriptions(subscriptions);
         }
       } catch (error) {
@@ -2169,6 +2175,19 @@
             `;
     }
 
+    setupTabListeners() {
+      if (!this.subscriptionSection) return;
+      const tabs = this.subscriptionSection.querySelectorAll(".mac-pricing-tab");
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          tabs.forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          this.activePeriod = tab.dataset.period || "month";
+          this.renderSubscriptions(this.subscriptions);
+        });
+      });
+    }
+
     renderSubscriptions(subscriptions) {
       if (!this.subscriptionSection) return;
 
@@ -2182,7 +2201,12 @@
         return;
       }
 
-      const html = subscriptions
+      // Filter by active period (monthly or yearly)
+      const filtered = subscriptions.filter(
+        (sub) => sub.interval === this.activePeriod
+      );
+
+      const html = filtered
         .map((sub) => this.buildSubscriptionCardHTML(sub))
         .join("");
       subscriptionGrid.innerHTML = html;
