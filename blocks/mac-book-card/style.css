@@ -1,14 +1,8 @@
 ﻿.mac-books-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 24px;
     width: 100%;
-}
-
-@media (max-width: 1024px) {
-    .mac-books-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
 }
 
 @media (max-width: 768px) {
@@ -26,7 +20,7 @@
 .mac-book-card {
     cursor: pointer;
     border: 1px solid #e5e7eb;
-    border-radius: 8px;
+    border-radius: 20px;
     position: relative;
     overflow: hidden;
     text-decoration: none;
@@ -47,7 +41,6 @@
     font-family: "Inter Tight";
     text-decoration: none !important;
     white-space: nowrap;
-    justify-content: end
 }
 
 .mac-book-card img {

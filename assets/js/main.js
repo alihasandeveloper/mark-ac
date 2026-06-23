@@ -41,6 +41,40 @@
   const WP_BASE_URL = "https://mark-ac.boomdevs.net";
   const COLLECTIONS_ROUTE = "/api/v1/collections/public";
   const CHARACTERS_ROUTE = "/api/v1/characters/public";
+
+  function getImageUrl(imageUrl) {
+    if (!imageUrl) return '';
+
+    const isDev = false;
+
+    // If backend already sends full URL (prod)
+    if (!isDev && imageUrl.startsWith('http')) {
+      return imageUrl;
+    }
+
+    // If backend sends relative path (dev)
+    if (isDev && !imageUrl.startsWith('http')) {
+      return joinUrl(ROOT_URL, imageUrl);
+    }
+
+    return imageUrl;
+  }
+
+  function normalizeBaseUrl(url) {
+    return (url || '').replace(/\/+$/, '');
+  }
+
+  function joinUrl(...parts) {
+    return parts
+      .filter(Boolean)
+      .map((part, index) =>
+        index === 0
+          ? normalizeBaseUrl(part)
+          : part.replace(/^\/+/, '').replace(/\/+$/, '')
+      )
+      .join('/');
+  }
+
   // ============================================
   // SCROLL ANIMATOR CLASS
   // ============================================
@@ -203,7 +237,7 @@
         },
         handbooks: {
           api: "https://api.markandrewscreative.com/api/v1/courses/handbooks/",
-          title: "Teachers Handbook",
+          title: "Decipleship Courses",
         },
         series: {
           api: "https://api.markandrewscreative.com/api/v1/courses/vbsify-series/",
@@ -696,7 +730,7 @@
 
     buildCourseCardHTML(typeKey, course) {
       const imageUrl = course.image
-        ? `${ROOT_URL}/${course.image.replace(/^\/+/, "")}`
+        ? (course.image.startsWith("http") ? course.image : `${ROOT_URL}/${course.image.replace(/^\/+/, "")}`)
         : "https://placehold.co/305x229";
       const firstCollection = course.collections && course.collections[0];
       const firstCharacter = course.characters && course.characters[0];
@@ -2161,11 +2195,7 @@
       const tier = sub.subscription_tier;
       const periodLabel = sub.interval === "month" ? "month" : "year";
       const features = tier.features || [];
-      const imgUrl = tier.image
-        ? tier.image.startsWith("http")
-          ? tier.image
-          : `${ROOT_URL}/${tier.image.replace(/^\/+/, "")}`
-        : "";
+      const imgUrl = getImageUrl(tier.image);
 
       return `
                 <div class="pricing-card" data-tier-id="${this.escapeHtml(sub.id)}">
@@ -2225,7 +2255,10 @@
     }
 
     showNoProducts() {
+
       // Clear the products grid
+      return;
+      // Because Product is hide also html dom is comment
       if (this.productsGrid) {
         this.productsGrid.innerHTML = "";
       }

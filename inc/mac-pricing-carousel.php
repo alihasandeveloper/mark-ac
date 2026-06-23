@@ -155,7 +155,7 @@ function mac_render_pricing_card($plan, $period, $layout = 'slider')
 
             <div class="pricing-card-image-wrapper">
                 <?php if (!empty($plan['image'])): ?>
-                    <img src="<?php echo esc_url(rtrim(ROOT_URL, '/') . '/' . ltrim($plan['image'], '/')); ?>"
+                    <img src="<?php echo esc_url(getImageUrl(ltrim($plan['image']))); ?>"
                          alt="<?php echo esc_attr($plan['title']); ?>" class="pricing-card-image">
                 <?php else: ?>
                     <div class="pricing-card-placeholder">

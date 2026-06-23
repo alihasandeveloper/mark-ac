@@ -11,10 +11,10 @@ function mac_register_curriculum_products_block()
 {
 
     wp_register_script(
-            'mac-curriculum-product-editor',
-            get_stylesheet_directory_uri() . '/blocks/mac-curriculum-product/block.js',
-            filemtime(get_stylesheet_directory() . '/blocks/mac-curriculum-product/block.js'),
-            true
+        'mac-curriculum-product-editor',
+        get_stylesheet_directory_uri() . '/blocks/mac-curriculum-product/block.js',
+        filemtime(get_stylesheet_directory() . '/blocks/mac-curriculum-product/block.js'),
+        true
     );
 
     // wp_register_style(
@@ -25,10 +25,10 @@ function mac_register_curriculum_products_block()
     // );
 
     register_block_type('mac-child/curriculum-products', array(
-            'editor_script' => 'mac-curriculum-product-editor',
-            'editor_style' => 'mac-curriculum-product-editor-style',
-            'style' => 'mac-curriculum-product-style',
-            'render_callback' => 'mac_render_curriculum_products_block',
+        'editor_script' => 'mac-curriculum-product-editor',
+        'editor_style' => 'mac-curriculum-product-editor-style',
+        'style' => 'mac-curriculum-product-style',
+        'render_callback' => 'mac_render_curriculum_products_block',
     ));
 }
 
@@ -46,24 +46,23 @@ function mac_render_curriculum_products_block($attributes)
         <div class="mac-unlock-header <?php echo isset($_GET['id']) ?>">
             <h2 class="mac-heading"><?php echo esc_html($attributes['heading'] ?? 'Unlock This Course'); ?></h2>
             <p class="mac-subheading"
-               data-subheading-template="<?php echo esc_attr($attributes['subheading'] ?? "You've selected \"{title}\" to begin learning, please choose the individual product or subscription plan that best fits your goals."); ?>"
-               data-course-scope="<?php echo esc_attr(isset($_GET['course']) ? sanitize_text_field($_GET['course']) : 'stories'); ?>">
+                data-subheading-template="<?php echo esc_attr($attributes['subheading'] ?? "You've selected \"{title}\" to begin learning, please choose subscription plan that best fits your goals."); ?>"
+                data-course-scope="<?php echo esc_attr(isset($_GET['course']) ? sanitize_text_field($_GET['course']) : 'stories'); ?>">
                 <!-- Populated by JavaScript -->
             </p>
         </div>
 
-
+        <!-- 
         <div class="mac-product-heading">
             <h6 class="mac-heading">
                 Products <span>Included In</span>
             </h6>
-        </div>
+        </div> -->
 
         <!-- Loading skeleton -->
-        <div class="mac-products-loading" id="mac-products-loading" style="display: block;">
+        <!-- <div class="mac-products-loading" id="mac-products-loading" style="display: block;">
             <div class="skeleton-wrapper">
 
-                <!-- Skeleton for course sections -->
                 <div class="skeleton-section">
                     <div class="skeleton-grid">
                         <div class="skeleton-card">
@@ -115,12 +114,11 @@ function mac_render_curriculum_products_block($attributes)
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- Products grid (populated by JavaScript) -->
-        <div class="mac-products-grid">
-            <!-- Products will be rendered here by JavaScript -->
-        </div>
+        <!-- <div class="mac-products-grid">
+        </div> -->
 
         <!-- Subscription section (populated by JavaScript) -->
         <div class="mac-subscription-section" style="display: none;">

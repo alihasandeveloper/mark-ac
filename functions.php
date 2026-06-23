@@ -153,3 +153,41 @@ function register_community_post()
 
 	register_post_type('community', $args);
 }
+
+function getImageUrl($imageUrl) {
+    if (!$imageUrl) return '';
+
+    $isDev = false;
+
+    // If backend already sends full URL (prod)
+    if (!$isDev && strpos($imageUrl, 'http') === 0) {
+        return $imageUrl;
+    }
+
+    // If backend sends relative path (dev)
+    if ($isDev && strpos($imageUrl, 'http') !== 0) {
+        return joinUrl(ROOT_URL, $imageUrl);
+    }
+
+    return $imageUrl;
+}
+
+function normalizeBaseUrl($url) {
+    return rtrim($url ?? '', '/');
+}
+
+function joinUrl(...$parts) {
+    $parts = array_filter($parts, fn($part) => !empty($part));
+
+    $normalized = [];
+
+    foreach ($parts as $index => $part) {
+        if ($index === 0) {
+            $normalized[] = normalizeBaseUrl($part);
+        } else {
+            $normalized[] = trim($part, '/');
+        }
+    }
+
+    return implode('/', $normalized);
+}
