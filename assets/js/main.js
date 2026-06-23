@@ -1999,12 +1999,12 @@
           this.fetchSubscriptions(),
         ]);
 
-        // Render products
-        if (products && products.length > 0) {
-          this.renderProducts(products);
-        } else {
-          this.showNoProducts();
-        }
+        // // Render products
+        // if (products && products.length > 0) {
+        //   this.renderProducts(products);
+        // } else {
+        //   this.showNoProducts();
+        // }
 
         // Render subscriptions
         if (subscriptions && subscriptions.length > 0) {
@@ -2257,8 +2257,7 @@
     showNoProducts() {
 
       // Clear the products grid
-      return;
-      // Because Product is hide also html dom is comment
+
       if (this.productsGrid) {
         this.productsGrid.innerHTML = "";
       }
