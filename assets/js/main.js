@@ -1012,7 +1012,7 @@
         },
         handbooks: {
           api: `${BASE_API}/courses/handbooks/`,
-          title: "Teachers Handbook",
+          title: 'Decipleship Courses',
         },
         series: {
           api: `${BASE_API}/courses/vbsify-series/`,
