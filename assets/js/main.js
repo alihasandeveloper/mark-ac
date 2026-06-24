@@ -1177,7 +1177,7 @@
     buildCourseCardHTML(course) {
       // Sanitize image URL to prevent potential issues
       const imageUrl = course.image
-        ? `${ROOT_URL}/${course.image.replace(/^\/+/, "")}`
+        ? (course.image.startsWith("http") ? course.image : `${ROOT_URL}/${course.image.replace(/^\/+/, "")}`)
         : "https://placehold.co/305x229?text=No+Image";
 
       const firstCollection = course.collections?.[0]; // Optional chaining
