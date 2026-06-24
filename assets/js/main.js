@@ -736,7 +736,8 @@
       const firstCharacter = course.characters && course.characters[0];
       const displayTags = course.tags ? course.tags.slice(0, 3) : [];
 
-      const courseUrl = `/products?scope=${typeKey}&id=${course.id}&selected=${encodeURIComponent(course.title)}`;
+      // const courseUrl = `/products?scope=${typeKey}&id=${course.id}&selected=${encodeURIComponent(course.title)}`;
+      const courseUrl = `/resources/${course.slug}?scope=${typeKey}&id=${course.id}`;
 
       return `
             <a href="${courseUrl}" class="curriculum-card-link">
@@ -1181,7 +1182,7 @@
 
       const firstCollection = course.collections?.[0]; // Optional chaining
       const displayTags = course.tags?.slice(0, 3) || []; // Optional chaining + fallback
-      const courseUrl = `/products?scope=${encodeURIComponent(this.currentCourseType)}&id=${encodeURIComponent(course.id)}&selected=${encodeURIComponent(course.title)}`;
+      const courseUrl = `/resources/${course.slug}?scope=${encodeURIComponent(this.currentCourseType)}&id=${encodeURIComponent(course.id)}`;
 
       return `
                 <a href="${courseUrl}" class="curriculum-card-link" aria-label="View ${this.escapeHtml(course.title, true)}">

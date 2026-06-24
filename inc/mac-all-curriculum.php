@@ -219,7 +219,8 @@ function mac_render_all_courses($courses, $type_key)
             <div class="card-content">
 
                 <h3 class="card-title">
-                    <a href="/products?course=<?php echo esc_attr($type_key); ?>&id=<?php echo esc_attr($course['id']); ?>">
+                    <a
+                        href="/resources/<?php echo esc_attr($course['slug']); ?>?scope=<?php echo esc_attr($type_key); ?>&id=<?php echo esc_attr($course['id']); ?>">
                         <?php echo esc_html($course['title']); ?>
                     </a>
                 </h3>
