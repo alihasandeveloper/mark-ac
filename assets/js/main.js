@@ -237,11 +237,11 @@
         },
         handbooks: {
           api: "https://api.markandrewscreative.com/api/v1/courses/handbooks/",
-          title: "Decipleship Courses",
+          title: "Discipleship Courses",
         },
         series: {
           api: "https://api.markandrewscreative.com/api/v1/courses/vbsify-series/",
-          title: "Vbsify Series",
+          title: "VBSify Series",
         },
       };
 
@@ -1013,11 +1013,11 @@
         },
         handbooks: {
           api: `${BASE_API}/courses/handbooks/`,
-          title: 'Decipleship Courses',
+          title: 'Discipleship Courses',
         },
         series: {
           api: `${BASE_API}/courses/vbsify-series/`,
-          title: "Vbsify Series",
+          title: "VBSify Series",
         },
       };
 
