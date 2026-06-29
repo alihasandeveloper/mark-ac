@@ -30,9 +30,18 @@ function frontis_child_style()
 
 	//enqueue script
 	wp_enqueue_script(
+		'swiper-js',
+		get_stylesheet_directory_uri() . '/assets/js/swiper/swiper-bundle.min.js',
+		array(),
+		'12.0.3',
+		true
+	);
+
+	// Main script depends on Swiper — enqueue Swiper first.
+	wp_enqueue_script(
 		'main-script',
 		get_stylesheet_directory_uri() . '/assets/js/main.js',
-		array(),
+		array('swiper-js'),
 		filemtime(get_stylesheet_directory() . '/assets/js/main.js'),
 		true
 	);
@@ -58,14 +67,6 @@ function frontis_child_style()
 		get_stylesheet_directory_uri() . '/assets/js/ScrollTrigger.min.js',
 		array(),
 		'3.14.1',
-		true
-	);
-
-	wp_enqueue_script(
-		'swiper-js',
-		get_stylesheet_directory_uri() . '/assets/js/swiper/swiper-bundle.min.js',
-		array(),
-		'12.0.3',
 		true
 	);
 

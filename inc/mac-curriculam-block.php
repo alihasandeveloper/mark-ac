@@ -7,11 +7,18 @@
 // Register the block
 function mac_register_curriculum_block()
 {
+    wp_register_style(
+        'mac-curriculum-block-style',
+        get_stylesheet_directory_uri() . '/blocks/mac-curriculam-block/style.css',
+        array('swiper-css'),
+        filemtime(get_stylesheet_directory() . '/blocks/mac-curriculam-block/style.css')
+    );
+
     // Register block script
     wp_register_script(
         'mac-curriculum-block-script',
         get_stylesheet_directory_uri() . '/blocks/mac-curriculam-block/block.js',
-        array(),
+        array('wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n'),
         filemtime(get_stylesheet_directory() . '/blocks/mac-curriculam-block/block.js')
     );
 
@@ -19,22 +26,38 @@ function mac_register_curriculum_block()
     register_block_type('mac-theme/curriculum-block', array(
         'editor_script' => 'mac-curriculum-block-script',
         'style' => 'mac-curriculum-block-style',
-        'render_callback' => 'mac_render_curriculum_block'
+        'render_callback' => 'mac_render_curriculum_block',
+        'attributes' => array(
+            'postsPerPage' => array(
+                'type' => 'number',
+                'default' => 9
+            ),
+            'layout' => array(
+                'type' => 'string',
+                'default' => 'grid'
+            )
+        )
     ));
 }
 add_action('init', 'mac_register_curriculum_block');
 
 function mac_render_curriculum_block($attributes)
 {
+    $layout = isset($attributes['layout']) ? $attributes['layout'] : 'grid';
+    $layout = in_array($layout, array('grid', 'slider'), true) ? $layout : 'grid';
+
     // Get current filters from URL for initial state
     $search = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '';
     $collections = isset($_GET['collections']) ? sanitize_text_field($_GET['collections']) : '';
     $characters = isset($_GET['characters']) ? sanitize_text_field($_GET['characters']) : '';
     $tags = isset($_GET['tags']) ? sanitize_text_field($_GET['tags']) : '';
 
+    wp_enqueue_style('mac-curriculum-block-style');
+
     ob_start();
     ?>
-    <div class="mac-curriculum-wrapper" data-search="<?php echo esc_attr($search); ?>"
+    <div class="mac-curriculum-wrapper" data-layout="<?php echo esc_attr($layout); ?>"
+        data-search="<?php echo esc_attr($search); ?>"
         data-collections="<?php echo esc_attr($collections); ?>" data-characters="<?php echo esc_attr($characters); ?>"
         data-tags="<?php echo esc_attr($tags); ?>">
         <div class="curriculum-header">

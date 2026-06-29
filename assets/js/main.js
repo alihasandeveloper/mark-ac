@@ -228,6 +228,8 @@
       this.searchForm = null;
       this.isInitialized = false;
       this.loading = false;
+      this.layout = "grid";
+      this.swiperInstances = [];
 
       // API Configuration
       this.courseTypes = {
@@ -290,6 +292,7 @@
       this.wrapper = document.querySelector(".mac-curriculum-wrapper");
       if (!this.wrapper) return;
 
+      this.layout = this.wrapper.dataset.layout === "slider" ? "slider" : "grid";
       this.filterForm = document.getElementById("curriculum-filter-form");
       this.searchForm = document.querySelector(".curriculum-search-form");
 
@@ -685,6 +688,12 @@
       }
 
       grid.innerHTML = html;
+
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          this.initCurriculumSwipers();
+        });
+      });
     }
 
     applyClientFilters(coursesData, filters) {
@@ -706,12 +715,7 @@
 
     buildCourseSectionHTML(typeKey, typeTitle, courses) {
       const count = courses.length;
-
-      return `
-            <div class="course-section">
-                <div class="section-header">
-                    <h6>${this.escapeHtml(typeTitle)} <span>${count}</span></h6>
-<!--                    <a href="/all-course?course=${typeKey}"  onclick="event.preventDefault(); window.__navigateNext('/all-course?course=${typeKey}')" class="see-all">-->
+      const seeAllLink = `
                     <a href="/all-course?course=${typeKey}"  class="see-all">
                         See all
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -719,13 +723,134 @@
                                 d="M13.4697 5.46967C13.7626 5.17678 14.2374 5.17678 14.5303 5.46967L20.5303 11.4697C20.8232 11.7626 20.8232 12.2374 20.5303 12.5303L14.5303 18.5303C14.2374 18.8232 13.7626 18.8232 13.4697 18.5303C13.1768 18.2374 13.1768 17.7626 13.4697 17.4697L18.1893 12.75H4C3.58579 12.75 3.25 12.4142 3.25 12C3.25 11.5858 3.58579 11.25 4 11.25H18.1893L13.4697 6.53033C13.1768 6.23744 13.1768 5.76256 13.4697 5.46967Z"
                                 fill="#1C274C" />
                         </svg>
-                    </a>
+                    </a>`;
+
+      if (this.layout === "slider") {
+        const cardsHtml = courses
+          .map(
+            (course) =>
+              `<div class="swiper-slide">${this.buildCourseCardHTML(typeKey, course)}</div>`,
+          )
+          .join("");
+
+        return `
+            <div class="course-section" data-section="${typeKey}">
+                <div class="section-header">
+                    <h6>${this.escapeHtml(typeTitle)} <span>${count}</span></h6>
+                    <div class="section-header-right">
+                        ${seeAllLink}
+                    </div>
+                </div>
+                <div class="curriculum-carousel-container">
+                    <div class="curriculum-swiper swiper">
+                        <div class="swiper-wrapper">
+                            ${cardsHtml}
+                        </div>
+                        <button type="button" class="swiper-button-prev swiper-nav-prev" aria-label="Previous"></button>
+                        <button type="button" class="swiper-button-next swiper-nav-next" aria-label="Next"></button>
+                    </div>
+                </div>
+            </div>
+        `;
+      }
+
+      return `
+            <div class="course-section">
+                <div class="section-header">
+                    <h6>${this.escapeHtml(typeTitle)} <span>${count}</span></h6>
+                    ${seeAllLink}
                 </div>
                 <div class="section-grid">
                     ${courses.map((course) => this.buildCourseCardHTML(typeKey, course)).join("")}
                 </div>
             </div>
         `;
+    }
+
+    destroyCurriculumSwipers() {
+      this.swiperInstances.forEach((swiper) => {
+        if (swiper && swiper.destroy) {
+          swiper.destroy(true, true);
+        }
+      });
+      this.swiperInstances = [];
+    }
+
+    initCurriculumSwipers() {
+      this.destroyCurriculumSwipers();
+
+      if (this.layout !== "slider") {
+        return;
+      }
+
+      const mountSwipers = () => {
+        const SwiperCtor = window.Swiper;
+        if (!SwiperCtor) {
+          return false;
+        }
+
+        const sections = document.querySelectorAll(
+          "#curriculum-grid .course-section[data-section]",
+        );
+
+        sections.forEach((section) => {
+          const swiperEl = section.querySelector(".curriculum-swiper");
+          if (!swiperEl || swiperEl.swiper) return;
+
+          const swiper = new SwiperCtor(swiperEl, {
+            slidesPerView: 1,
+            spaceBetween: 20,
+            watchOverflow: true,
+            observer: true,
+            observeParents: true,
+            navigation: {
+              nextEl: swiperEl.querySelector(".swiper-button-next"),
+              prevEl: swiperEl.querySelector(".swiper-button-prev"),
+            },
+            breakpoints: {
+              640: {
+                slidesPerView: 2,
+                spaceBetween: 20,
+              },
+              1024: {
+                slidesPerView: 3,
+                spaceBetween: 20,
+              },
+            },
+            on: {
+              init(swiperInstance) {
+                swiperInstance.update();
+              },
+            },
+          });
+
+          this.swiperInstances.push(swiper);
+        });
+
+        if (this.swiperInstances.length > 0) {
+          window.setTimeout(() => {
+            this.swiperInstances.forEach((swiper) => {
+              if (swiper && swiper.update) {
+                swiper.update();
+              }
+            });
+          }, 100);
+        }
+
+        return this.swiperInstances.length > 0 || sections.length === 0;
+      };
+
+      if (mountSwipers()) {
+        return;
+      }
+
+      let attempts = 0;
+      const retryTimer = window.setInterval(() => {
+        attempts += 1;
+        if (mountSwipers() || attempts >= 20) {
+          window.clearInterval(retryTimer);
+        }
+      }, 100);
     }
 
     buildCourseCardHTML(typeKey, course) {
@@ -966,6 +1091,8 @@
     }
 
     destroy() {
+      this.destroyCurriculumSwipers();
+
       // Remove event listeners
       document.querySelectorAll(".filter-title").forEach((title) => {
         if (title._clickHandler) {
@@ -985,11 +1112,7 @@
     }
   }
 
-  // Initialize when DOM is ready
-  if (typeof window !== "undefined") {
-    const curriculumFilter = new CurriculumFilter();
-    curriculumFilter.init();
-  }
+  // Curriculum filter is initialized via initialize() below.
 
   // ============================================
   // ALL COURSES MANAGER CLASS

@@ -2,7 +2,7 @@
     const { registerBlockType } = blocks;
     const { createElement } = element;
     const { InspectorControls } = editor;
-    const { PanelBody, RangeControl } = components;
+    const { PanelBody, RangeControl, SelectControl } = components;
     const { __ } = i18n;
     
     registerBlockType('mac-theme/curriculum-block', {
@@ -19,12 +19,16 @@
             postsPerPage: {
                 type: 'number',
                 default: 9
+            },
+            layout: {
+                type: 'string',
+                default: 'grid'
             }
         },
         
         edit: function(props) {
             const { attributes, setAttributes } = props;
-            const { postsPerPage } = attributes;
+            const { postsPerPage, layout } = attributes;
             
             return [
                 createElement(InspectorControls, {},
@@ -32,6 +36,17 @@
                         title: __('Curriculum Settings', 'mac-theme'), 
                         initialOpen: true 
                     },
+                        createElement(SelectControl, {
+                            label: __('Layout', 'mac-theme'),
+                            value: layout,
+                            options: [
+                                { label: __('Grid', 'mac-theme'), value: 'grid' },
+                                { label: __('Slider', 'mac-theme'), value: 'slider' }
+                            ],
+                            onChange: function(value) {
+                                setAttributes({ layout: value });
+                            }
+                        }),
                         createElement(RangeControl, {
                             label: __('Posts Per Page', 'mac-theme'),
                             value: postsPerPage,
@@ -64,7 +79,7 @@
                                 color: '#666', 
                                 marginBottom: '15px' 
                             }
-                        }, __('Posts per page: ' + postsPerPage, 'mac-theme')),
+                        }, __('Layout: ' + (layout === 'slider' ? 'Slider' : 'Grid'), 'mac-theme') + ' | ' + __('Posts per page: ' + postsPerPage, 'mac-theme')),
                         createElement('div', {
                             style: { 
                                 fontSize: '13px', 
@@ -103,7 +118,9 @@
                                     fontWeight: '500',
                                     marginBottom: '8px'
                                 }
-                            }, __('Curriculum Grid with Filters', 'mac-theme')),
+                            }, layout === 'slider'
+                                ? __('Curriculum Slider with Filters (3 cards per view)', 'mac-theme')
+                                : __('Curriculum Grid with Filters', 'mac-theme')),
                             createElement('p', {
                                 style: {
                                     fontSize: '14px',
