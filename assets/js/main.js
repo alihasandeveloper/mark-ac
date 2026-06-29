@@ -776,6 +776,29 @@
       this.swiperInstances = [];
     }
 
+    prepareSwiperSlidesForLoop(swiperEl, minCount = 9) {
+      const wrapper = swiperEl.querySelector(".swiper-wrapper");
+      if (!wrapper) return 0;
+
+      const slides = Array.from(
+        wrapper.querySelectorAll(":scope > .swiper-slide"),
+      );
+      if (slides.length === 0) return 0;
+      if (slides.length >= minCount) return slides.length;
+
+      const slideMarkup = slides.map((slide) => slide.outerHTML);
+
+      while (
+        wrapper.querySelectorAll(":scope > .swiper-slide").length < minCount
+      ) {
+        slideMarkup.forEach((html) => {
+          wrapper.insertAdjacentHTML("beforeend", html);
+        });
+      }
+
+      return wrapper.querySelectorAll(":scope > .swiper-slide").length;
+    }
+
     initCurriculumSwipers() {
       this.destroyCurriculumSwipers();
 
@@ -797,10 +820,17 @@
           const swiperEl = section.querySelector(".curriculum-swiper");
           if (!swiperEl || swiperEl.swiper) return;
 
+          this.prepareSwiperSlidesForLoop(swiperEl, 9);
+
           const swiper = new SwiperCtor(swiperEl, {
             slidesPerView: 1,
             spaceBetween: 20,
-            watchOverflow: true,
+            speed: 500,
+            slidesPerGroup: 1,
+            loop: true,
+            loopAddBlankSlides: true,
+            loopAdditionalSlides: 3,
+            loopPreventsSliding: false,
             observer: true,
             observeParents: true,
             navigation: {
@@ -811,10 +841,12 @@
               640: {
                 slidesPerView: 2,
                 spaceBetween: 20,
+                loopAdditionalSlides: 2,
               },
               1024: {
                 slidesPerView: 3,
                 spaceBetween: 20,
+                loopAdditionalSlides: 3,
               },
             },
             on: {

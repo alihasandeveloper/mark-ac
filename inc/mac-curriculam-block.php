@@ -7,12 +7,12 @@
 // Register the block
 function mac_register_curriculum_block()
 {
-    wp_register_style(
-        'mac-curriculum-block-style',
-        get_stylesheet_directory_uri() . '/blocks/mac-curriculam-block/style.css',
-        array('swiper-css'),
-        filemtime(get_stylesheet_directory() . '/blocks/mac-curriculam-block/style.css')
-    );
+    // wp_register_style(
+    //     'mac-curriculum-block-style',
+    //     get_stylesheet_directory_uri() . '/blocks/mac-curriculam-block/style.css',
+    //     array('swiper-css'),
+    //     filemtime(get_stylesheet_directory() . '/blocks/mac-curriculam-block/style.css')
+    // );
 
     // Register block script
     wp_register_script(
@@ -25,7 +25,7 @@ function mac_register_curriculum_block()
     // Register the block
     register_block_type('mac-theme/curriculum-block', array(
         'editor_script' => 'mac-curriculum-block-script',
-        'style' => 'mac-curriculum-block-style',
+        // 'style' => 'mac-curriculum-block-style',
         'render_callback' => 'mac_render_curriculum_block',
         'attributes' => array(
             'postsPerPage' => array(
