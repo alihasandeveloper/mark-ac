@@ -11,10 +11,10 @@ function mac_register_pricing_carousel_block()
 {
     // Register block editor script
     wp_register_script(
-            'mac-pricing-carousel-block',
-            get_stylesheet_directory_uri() . '/blocks/mac-pricing-carousel/block.js',
-            array('wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n'),
-            filemtime(get_stylesheet_directory() . '/blocks/mac-pricing-carousel/block.js')
+        'mac-pricing-carousel-block',
+        get_stylesheet_directory_uri() . '/blocks/mac-pricing-carousel/block.js',
+        array('wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n'),
+        filemtime(get_stylesheet_directory() . '/blocks/mac-pricing-carousel/block.js')
     );
 
     // Register block styles
@@ -27,28 +27,28 @@ function mac_register_pricing_carousel_block()
 
     // Register the block
     register_block_type('mac/pricing-carousel', array(
-            'editor_script' => 'mac-pricing-carousel-block',
-            'script' => 'mac-pricing-carousel-frontend',
-            'style' => 'mac-pricing-carousel-style',
-            'render_callback' => 'mac_pricing_carousel_render_callback',
-            'attributes' => array(
-                    'layout' => array(
-                            'type' => 'string',
-                            'default' => 'slider'
-                    ),
-                    'numberOfPlans' => array(
-                            'type' => 'number',
-                            'default' => 3
-                    ),
-                    'autoplay' => array(
-                            'type' => 'boolean',
-                            'default' => true
-                    ),
-                    'slidesToShow' => array(
-                            'type' => 'number',
-                            'default' => 3
-                    )
+        'editor_script' => 'mac-pricing-carousel-block',
+        'script' => 'mac-pricing-carousel-frontend',
+        'style' => 'mac-pricing-carousel-style',
+        'render_callback' => 'mac_pricing_carousel_render_callback',
+        'attributes' => array(
+            'layout' => array(
+                'type' => 'string',
+                'default' => 'slider'
+            ),
+            'numberOfPlans' => array(
+                'type' => 'number',
+                'default' => 3
+            ),
+            'autoplay' => array(
+                'type' => 'boolean',
+                'default' => true
+            ),
+            'slidesToShow' => array(
+                'type' => 'number',
+                'default' => 3
             )
+        )
     ));
 }
 add_action('init', 'mac_register_pricing_carousel_block');
@@ -63,17 +63,36 @@ function mac_pricing_carousel_render_callback($attributes, $content)
 
     // Fetch pricing data
     $pricing_data = mac_fetch_pricing_data();
+
     $error_message = empty($pricing_data) ? 'No pricing information found.' : '';
 
     // Handle error case
     if (!$pricing_data || $error_message) {
         return '<div class="mac-pricing-error" style="color: #666; padding: 20px; text-align: center;">'
-                . esc_html($error_message ?: 'Error loading pricing data')
-                . '</div>';
+            . esc_html($error_message ?: 'Error loading pricing data')
+            . '</div>';
     }
 
     $monthly_plans = $pricing_data['month'] ?? [];
     $yearly_plans = $pricing_data['year'] ?? [];
+
+    // Group plans by tags
+    $group_plans_by_tags = function ($plans) {
+        $grouped = array();
+        foreach ($plans as $plan) {
+            $tags = !empty($plan['tags']) ? $plan['tags'] : array('Plans');
+            foreach ($tags as $tag) {
+                if (!isset($grouped[$tag])) {
+                    $grouped[$tag] = array();
+                }
+                $grouped[$tag][] = $plan;
+            }
+        }
+        return $grouped;
+    };
+
+    $monthly_grouped = $group_plans_by_tags($monthly_plans);
+    $yearly_grouped = $group_plans_by_tags($yearly_plans);
 
     // Start output buffering
     ob_start();
@@ -88,43 +107,59 @@ function mac_pricing_carousel_render_callback($attributes, $content)
 
         <!-- Monthly Carousel/Grid -->
         <div class="mac-pricing-carousel-container" data-pricing-period="month">
-            <div class="<?php echo $layout === 'grid' ? 'mac-pricing-grid' : 'mac-pricing-swiper swiper'; ?>">
-                <div class="<?php echo $layout === 'grid' ? 'mac-pricing-grid-wrapper' : 'swiper-wrapper'; ?>">
-                    <?php if (!empty($monthly_plans)): ?>
-                        <?php foreach ($monthly_plans as $plan):
-                            echo mac_render_pricing_card($plan, 'month', $layout);
-                        endforeach; ?>
-                    <?php else: ?>
-                        <div class="<?php echo $layout === 'grid' ? 'mac-pricing-grid-item' : 'swiper-slide'; ?>">
-                            <div class="no-plans-message">No pricing plans available for monthly.</div>
+            <?php if (!empty($monthly_grouped)): ?>
+                <?php foreach ($monthly_grouped as $tag_name => $plans): ?>
+                    <div class="mac-pricing-group" style="margin-bottom: 40px;">
+                        <h2 class="mac-pricing-group-heading">
+                            <?php echo esc_html($tag_name); ?>
+                        </h2>
+                        <div class="mac-pricing-slider-container">
+                            <div class="<?php echo $layout === 'grid' ? 'mac-pricing-grid' : 'mac-pricing-swiper swiper'; ?>">
+                                <div class="<?php echo $layout === 'grid' ? 'mac-pricing-grid-wrapper' : 'swiper-wrapper'; ?>">
+                                    <?php foreach ($plans as $plan):
+                                        echo mac_render_pricing_card($plan, 'month', $layout);
+                                    endforeach; ?>
+                                </div>
+                            </div>
+                            <?php if ($layout === 'slider'): ?>
+                                <div class="swiper-button-next"></div>
+                                <div class="swiper-button-prev"></div>
+                            <?php endif; ?>
                         </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <?php if ($layout === 'slider'): ?>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="no-plans-message" style="text-align: center; padding: 40px 20px;">No pricing plans available for
+                    monthly.</div>
             <?php endif; ?>
         </div>
 
         <!-- Yearly Carousel/Grid -->
         <div class="mac-pricing-carousel-container" data-pricing-period="year" style="display: none;">
-            <div class="<?php echo $layout === 'grid' ? 'mac-pricing-grid' : 'mac-pricing-swiper swiper'; ?>">
-                <div class="<?php echo $layout === 'grid' ? 'mac-pricing-grid-wrapper' : 'swiper-wrapper'; ?>">
-                    <?php if (!empty($yearly_plans)): ?>
-                        <?php foreach ($yearly_plans as $plan):
-                            echo mac_render_pricing_card($plan, 'year', $layout);
-                        endforeach; ?>
-                    <?php else: ?>
-                        <div class="<?php echo $layout === 'grid' ? 'mac-pricing-grid-item' : 'swiper-slide'; ?>">
-                            <div class="no-plans-message">No pricing plans available for yearly.</div>
+            <?php if (!empty($yearly_grouped)): ?>
+                <?php foreach ($yearly_grouped as $tag_name => $plans): ?>
+                    <div class="mac-pricing-group" style="margin-bottom: 40px;">
+                        <h2 class="mac-pricing-group-heading">
+                            <?php echo esc_html($tag_name); ?>
+                        </h2>
+                        <div class="mac-pricing-slider-container">
+                            <div class="<?php echo $layout === 'grid' ? 'mac-pricing-grid' : 'mac-pricing-swiper swiper'; ?>">
+                                <div class="<?php echo $layout === 'grid' ? 'mac-pricing-grid-wrapper' : 'swiper-wrapper'; ?>">
+                                    <?php foreach ($plans as $plan):
+                                        echo mac_render_pricing_card($plan, 'year', $layout);
+                                    endforeach; ?>
+                                </div>
+                            </div>
+                            <?php if ($layout === 'slider'): ?>
+                                <div class="swiper-button-next"></div>
+                                <div class="swiper-button-prev"></div>
+                            <?php endif; ?>
                         </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <?php if ($layout === 'slider'): ?>
-                <div class="swiper-button-next"></div>
-                <div class="swiper-button-prev"></div>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="no-plans-message" style="text-align: center; padding: 40px 20px;">No pricing plans available for
+                    yearly.</div>
             <?php endif; ?>
         </div>
     </div>
@@ -139,10 +174,10 @@ function mac_pricing_carousel_render_callback($attributes, $content)
 function mac_render_pricing_card($plan, $period, $layout = 'slider')
 {
     $features = !empty($plan['features']) ? $plan['features'] : [
-            'Access to all features',
-            'Priority support',
-            'Regular updates',
-            'Cancel anytime'
+        'Access to all features',
+        'Priority support',
+        'Regular updates',
+        'Cancel anytime'
     ];
 
     $period_label = $period === 'month' ? 'month' : 'year';
@@ -156,7 +191,7 @@ function mac_render_pricing_card($plan, $period, $layout = 'slider')
             <div class="pricing-card-image-wrapper">
                 <?php if (!empty($plan['image'])): ?>
                     <img src="<?php echo esc_url(getImageUrl(ltrim($plan['image']))); ?>"
-                         alt="<?php echo esc_attr($plan['title']); ?>" class="pricing-card-image">
+                        alt="<?php echo esc_attr($plan['title']); ?>" class="pricing-card-image">
                 <?php else: ?>
                     <div class="pricing-card-placeholder">
                         <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
@@ -176,7 +211,7 @@ function mac_render_pricing_card($plan, $period, $layout = 'slider')
                     <?php else: ?>
                         <h5>
                             <span
-                                    class="price-currency"><?php echo $plan['currency'] === 'USD' ? '$' : esc_html($plan['currency']); ?></span>
+                                class="price-currency"><?php echo $plan['currency'] === 'USD' ? '$' : esc_html($plan['currency']); ?></span>
                             <span class="price-amount"><?php echo floor($plan['price']); ?></span>
                             <span class="price-interval">/<?php echo $period_label; ?></span>
                         </h5>
@@ -189,8 +224,8 @@ function mac_render_pricing_card($plan, $period, $layout = 'slider')
                         <?php endforeach; ?>
                     </ul>
                 <?php endif; ?>
-                <a href="<?php echo esc_url('/checkout?subscription=' . $plan['id']); ?>"  class="pricing-card-button"
-                   data-tier-slug="<?php echo esc_attr($plan['slug']); ?>">
+                <a href="<?php echo esc_url('/checkout?subscription=' . $plan['id']); ?>" class="pricing-card-button"
+                    data-tier-slug="<?php echo esc_attr($plan['slug']); ?>">
                     <?php echo esc_html($plan['button_text'] ?? 'Subscribe Now'); ?>
                 </a>
             </div>
@@ -205,7 +240,7 @@ function mac_render_pricing_card($plan, $period, $layout = 'slider')
  */
 function mac_fetch_pricing_data()
 {
-//    // Check for cached data (cache for 1 hour)
+    //    // Check for cached data (cache for 1 hour)
 //    $cache_key = 'mac_pricing_data';
 //    $cached_data = get_transient($cache_key);
 //
@@ -217,10 +252,10 @@ function mac_fetch_pricing_data()
     $api_url = BASE_API . '/billing/public/tiers/?page=1&page_size=1000';
 
     $response = wp_remote_get($api_url, array(
-            'timeout' => 15,
-            'headers' => array(
-                    'Accept' => 'application/json',
-            )
+        'timeout' => 15,
+        'headers' => array(
+            'Accept' => 'application/json',
+        )
     ));
 
     if (is_wp_error($response)) {
@@ -247,8 +282,8 @@ function mac_fetch_pricing_data()
 function mac_transform_pricing_data($results)
 {
     $pricing = array(
-            'month' => array(),
-            'year' => array()
+        'month' => array(),
+        'year' => array()
     );
 
     foreach ($results as $item) {
@@ -261,17 +296,18 @@ function mac_transform_pricing_data($results)
         }
 
         $plan = array(
-                'id' => $item['id'],
-                'title' => $tier['title'],
-                'description' => $tier['description'],
-                'price' => floatval($item['price']),
-                'currency' => $item['currency'],
-                'interval' => $interval,
-                'image' => !empty($tier['image']) ? $tier['image'] : null,
-                'features' => !empty($tier['features']) ? $tier['features'] : array(),
-                'slug' => $tier['slug'],
-                'button_text' => 'Subscribe Now',
-                'button_link' => '#'
+            'id' => $item['id'],
+            'title' => $tier['title'],
+            'description' => $tier['description'],
+            'price' => floatval($item['price']),
+            'currency' => $item['currency'],
+            'interval' => $interval,
+            'image' => !empty($tier['image']) ? $tier['image'] : null,
+            'features' => !empty($tier['features']) ? $tier['features'] : array(),
+            'slug' => $tier['slug'],
+            'tags' => !empty($tier['tags']) ? $tier['tags'] : array(),
+            'button_text' => 'Subscribe Now',
+            'button_link' => '#'
         );
 
         $pricing[$interval][] = $plan;
@@ -299,9 +335,9 @@ function mac_add_clear_pricing_cache_button($admin_bar)
     }
 
     $admin_bar->add_menu(array(
-            'id' => 'mac-clear-pricing-cache',
-            'title' => 'Clear Pricing Cache',
-            'href' => wp_nonce_url(admin_url('admin-post.php?action=mac_clear_pricing_cache'), 'mac_clear_cache'),
+        'id' => 'mac-clear-pricing-cache',
+        'title' => 'Clear Pricing Cache',
+        'href' => wp_nonce_url(admin_url('admin-post.php?action=mac_clear_pricing_cache'), 'mac_clear_cache'),
     ));
 }
 

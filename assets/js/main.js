@@ -783,7 +783,7 @@
       const slides = Array.from(
         wrapper.querySelectorAll(":scope > .swiper-slide"),
       );
-      if (slides.length === 0) return 0;
+      if (slides.length <= 1) return slides.length;
       if (slides.length >= minCount) return slides.length;
 
       const slideMarkup = slides.map((slide) => slide.outerHTML);
@@ -820,16 +820,27 @@
           const swiperEl = section.querySelector(".curriculum-swiper");
           if (!swiperEl || swiperEl.swiper) return;
 
-          this.prepareSwiperSlidesForLoop(swiperEl, 9);
+          const originalSlides = swiperEl.querySelectorAll(".swiper-wrapper > .swiper-slide");
+          const slideCount = originalSlides.length;
+          const shouldLoop = slideCount > 1;
+
+          if (shouldLoop) {
+            this.prepareSwiperSlidesForLoop(swiperEl, 9);
+          } else {
+            const nextEl = swiperEl.querySelector(".swiper-button-next");
+            const prevEl = swiperEl.querySelector(".swiper-button-prev");
+            if (nextEl) nextEl.style.display = "none";
+            if (prevEl) prevEl.style.display = "none";
+          }
 
           const swiper = new SwiperCtor(swiperEl, {
             slidesPerView: 1,
             spaceBetween: 20,
             speed: 500,
             slidesPerGroup: 1,
-            loop: true,
-            loopAddBlankSlides: true,
-            loopAdditionalSlides: 3,
+            loop: shouldLoop,
+            loopAddBlankSlides: shouldLoop,
+            loopAdditionalSlides: shouldLoop ? 3 : 0,
             loopPreventsSliding: false,
             observer: true,
             observeParents: true,
@@ -841,12 +852,12 @@
               640: {
                 slidesPerView: 2,
                 spaceBetween: 20,
-                loopAdditionalSlides: 2,
+                loopAdditionalSlides: shouldLoop ? 2 : 0,
               },
               1024: {
                 slidesPerView: 3,
                 spaceBetween: 20,
-                loopAdditionalSlides: 3,
+                loopAdditionalSlides: shouldLoop ? 3 : 0,
               },
             },
             on: {
@@ -1847,15 +1858,20 @@
       // Initialize Swiper for each period
       carouselContainers.forEach(function (container) {
         const period = container.dataset.pricingPeriod;
-        const swiperEl = container.querySelector(".mac-pricing-swiper");
+        swiperInstances[period] = [];
+        const swiperEls = container.querySelectorAll(".mac-pricing-swiper");
 
-        if (swiperEl) {
-          swiperInstances[period] = new Swiper(swiperEl, {
+        swiperEls.forEach(function (swiperEl) {
+          const sliderContainer = swiperEl.closest(".mac-pricing-slider-container");
+          const nextEl = sliderContainer ? sliderContainer.querySelector(".swiper-button-next") : null;
+          const prevEl = sliderContainer ? sliderContainer.querySelector(".swiper-button-prev") : null;
+
+          const swiper = new Swiper(swiperEl, {
             slidesPerView: 1,
             spaceBetween: 20,
             navigation: {
-              nextEl: container.querySelector(".swiper-button-next"),
-              prevEl: container.querySelector(".swiper-button-prev"),
+              nextEl: nextEl,
+              prevEl: prevEl,
             },
             breakpoints: {
               640: {
@@ -1868,7 +1884,8 @@
               },
             },
           });
-        }
+          swiperInstances[period].push(swiper);
+        });
       });
 
       // Tab switching
@@ -1888,8 +1905,10 @@
             if (period === newPeriod) {
               container.style.display = "";
               if (swiperInstances[period]) {
-                swiperInstances[period].update();
-                swiperInstances[period].slideTo(0, 0);
+                swiperInstances[period].forEach(function (swiper) {
+                  swiper.update();
+                  swiper.slideTo(0, 0);
+                });
               }
             } else {
               container.style.display = "none";
@@ -1908,9 +1927,13 @@
         tabHandlers.forEach(({ tab, handler }) => {
           tab.removeEventListener("click", handler);
         });
-        Object.values(swiperInstances).forEach((swiper) => {
-          if (swiper && swiper.destroy) {
-            swiper.destroy();
+        Object.values(swiperInstances).forEach((swipers) => {
+          if (Array.isArray(swipers)) {
+            swipers.forEach((swiper) => {
+              if (swiper && swiper.destroy) {
+                swiper.destroy();
+              }
+            });
           }
         });
       });
