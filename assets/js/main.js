@@ -1975,12 +1975,24 @@
       this.emailInput = document.getElementById("community_email");
       this.responseMsg = document.getElementById("form-response-message");
       this.submitBtn = document.getElementById("submit-community-post");
+      this.modal = document.getElementById("mac-success-modal");
+      this.modalClose = document.getElementById("mac-modal-close-btn");
 
       this.handleSubmitBound = this.handleSubmit.bind(this);
       this.handleFocusBound = this.handleFocus.bind(this);
 
       this.form.addEventListener("submit", this.handleSubmitBound);
       this.emailInput.addEventListener("focus", this.handleFocusBound);
+
+      if (this.modal && this.modalClose) {
+        this.closeModalBound = () => this.closeModal();
+        this.modalClose.addEventListener("click", this.closeModalBound);
+        this.modal.addEventListener("click", (e) => {
+          if (e.target === this.modal) {
+            this.closeModalBound();
+          }
+        });
+      }
 
       this.isInitialized = true;
     }
@@ -2044,8 +2056,14 @@
         const result = await response.json();
 
         if (result.success) {
-          this.showMessage(result.data.message, "success");
+          if (this.responseMsg) {
+            this.responseMsg.textContent = "";
+            this.responseMsg.classList.remove("success", "error");
+          }
           this.form.reset();
+          if (this.modal) {
+            this.openModal();
+          }
         } else {
           this.showMessage(result.data.message, "error");
         }
@@ -2058,6 +2076,17 @@
       } finally {
         this.setLoading(false);
       }
+    }
+
+    openModal() {
+      this.modal.classList.add("active");
+      this._bodyOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+    }
+
+    closeModal() {
+      this.modal.classList.remove("active");
+      document.body.style.overflow = this._bodyOverflow ?? "";
     }
 
     showMessage(message, type) {

@@ -44,9 +44,21 @@ function mac_render_community_block($attributes)
             <div id="form-response-message"></div>
         </form>
     </div>
-    <style>
 
-    </style>
+    <!-- Success Modal Popup -->
+    <div class="mac-modal-overlay" id="mac-success-modal">
+        <div class="mac-modal-card">
+            <div class="mac-modal-icon-wrapper">
+                <svg viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <h3 class="mac-modal-title">Success!</h3>
+            <p class="mac-modal-message">Your free resource is on its way. Please check your inbox shortly!</p>
+            <button class="mac-modal-btn" id="mac-modal-close-btn">Got it</button>
+        </div>
+    </div>
+
     <?php
     return ob_get_clean();
 }
@@ -62,6 +74,19 @@ function mac_create_community_post()
 
     if (empty($title)) {
         wp_send_json_error(array('message' => 'Something went wrong. Please provide a valid email address.'));
+    }
+
+    // Check if this email already claimed a free resource
+    $existing = new WP_Query(array(
+        'post_type' => 'community',
+        'title' => $title,
+        'post_status' => 'publish',
+        'posts_per_page' => 1,
+        'fields' => 'ids',
+    ));
+
+    if ($existing->have_posts()) {
+        wp_send_json_error(array('message' => 'You have already claimed your free resource.'));
     }
 
     // Send to external API
