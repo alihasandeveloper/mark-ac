@@ -205,6 +205,11 @@ function mac_render_pricing_card($plan, $period, $layout = 'slider')
 
             <div class="pricing-card-content">
                 <h3 class="pricing-card-title"><?php echo esc_html($plan['title']); ?></h3>
+                
+                <?php if($plan['subtitle']): ?>
+                    <span style="display: block;margin-bottom: 16px"><?php echo esc_html($plan['subtitle']); ?></span>
+                <?php endif; ?>
+                
                 <div class="pricing-card-price">
                     <?php if (floatval($plan['price']) === 0.0): ?>
                         <span class="price-free">00.00</span>
@@ -298,6 +303,7 @@ function mac_transform_pricing_data($results)
         $plan = array(
             'id' => $item['id'],
             'title' => $tier['title'],
+            'subtitle' => $tier['subtitle'],
             'description' => $tier['description'],
             'price' => floatval($item['price']),
             'currency' => $item['currency'],

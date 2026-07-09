@@ -250,9 +250,6 @@ a.curriculum-card-link {
 /* Grid Styles */
 .curriculum-main {
     position: relative;
-    min-width: 0;
-    max-width: 100%;
-    overflow: hidden;
 }
 
 .curriculum-grid {
@@ -260,15 +257,11 @@ a.curriculum-card-link {
     flex-direction: column;
     gap: 44px 24px;
     transition: opacity 0.3s;
-    min-width: 0;
-    max-width: 100%;
 }
 
 .curriculum-card {
     overflow: hidden;
     transition: transform 0.3s, box-shadow 0.3s;
-    min-width: 0;
-    max-width: 100%;
 }
 
 .card-image {
@@ -417,52 +410,26 @@ a.curriculum-card-link {
 }
 
 /* Curriculum Swiper slider */
-.curriculum-carousel-container {
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-}
-
 .curriculum-swiper {
     overflow: hidden;
     position: relative;
     margin-bottom: 8px;
     width: 100%;
-    max-width: 100%;
-    min-width: 0;
 }
 
 .mac-curriculum-wrapper[data-layout="slider"] .course-section {
-    /* margin-bottom: 40px; */
-    min-width: 0;
-    max-width: 100%;
+    margin-bottom: 40px;
     overflow: hidden;
+}
+
+.mac-curriculum-wrapper[data-layout="slider"] .curriculum-swiper .swiper-wrapper {
+    display: flex;
 }
 
 .mac-curriculum-wrapper[data-layout="slider"] .curriculum-swiper .swiper-slide {
     height: auto;
-    min-width: 0;
-    max-width: 100%;
-    box-sizing: border-box;
-    display: flex;
-}
-
-.mac-curriculum-wrapper[data-layout="slider"] .curriculum-swiper:not(.swiper-initialized) .swiper-slide {
     flex-shrink: 0;
-    width: 100%;
-}
-
-@media (min-width: 640px) {
-    .mac-curriculum-wrapper[data-layout="slider"] .curriculum-swiper:not(.swiper-initialized) .swiper-slide {
-        width: calc((100% - 20px) / 2);
-    }
-}
-
-@media (min-width: 1024px) {
-    .mac-curriculum-wrapper[data-layout="slider"] .curriculum-swiper:not(.swiper-initialized) .swiper-slide {
-        width: calc((100% - 40px) / 3);
-    }
+    box-sizing: border-box;
 }
 
 .curriculum-swiper .swiper-slide {
@@ -473,52 +440,6 @@ a.curriculum-card-link {
     display: block;
     height: 100%;
     width: 100%;
-    min-width: 0;
-    max-width: 100%;
-}
-
-.curriculum-carousel-container .swiper-button-prev,
-.curriculum-carousel-container .swiper-button-next {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 1px solid #E6E6E6;
-    background: #fff;
-    color: #0D0D0D;
-    margin-top: 0;
-    top: 114px;
-    transform: translateY(-50%);
-}
-
-.curriculum-carousel-container .swiper-button-prev {
-    left: 10px;
-}
-
-.curriculum-carousel-container .swiper-button-next {
-    right: 10px;
-}
-
-.curriculum-carousel-container .swiper-button-next svg, .curriculum-carousel-container .swiper-button-prev svg {
-    width: 8px;
-}
-
-.curriculum-carousel-container .swiper-button-prev:after,
-.curriculum-carousel-container .swiper-button-next:after {
-    font-size: 14px;
-    font-weight: 700;
-}
-
-.curriculum-carousel-container .swiper-button-prev:hover,
-.curriculum-carousel-container .swiper-button-next:hover {
-    background: #0D0D0D;
-    color: #fff;
-    border-color: #0D0D0D;
-}
-
-.curriculum-carousel-container .swiper-button-disabled {
-    opacity: 1;
-    pointer-events: auto;
-    cursor: pointer;
 }
 
 .section-grid {
@@ -728,13 +649,5 @@ a.curriculum-card-link {
     .curriculum-sidebar {
         position: relative;
         top: 0;
-    }
-
-    .curriculum-carousel-container .swiper-button-prev {
-        left: 4px;
-    }
-
-    .curriculum-carousel-container .swiper-button-next {
-        right: 4px;
     }
 }

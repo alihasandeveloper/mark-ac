@@ -237,13 +237,13 @@
           api: "https://api.markandrewscreative.com/api/v1/courses/bible-stories/",
           title: "Bible Stories",
         },
-        handbooks: {
-          api: "https://api.markandrewscreative.com/api/v1/courses/handbooks/",
-          title: "Discipleship Courses",
-        },
         series: {
           api: "https://api.markandrewscreative.com/api/v1/courses/vbsify-series/",
           title: "VBSify Series",
+        },
+        handbooks: {
+          api: "https://api.markandrewscreative.com/api/v1/courses/handbooks/",
+          title: "Discipleship Courses",
         },
       };
 
@@ -1177,13 +1177,13 @@
           api: `${BASE_API}/courses/bible-stories/`,
           title: "Bible Stories",
         },
-        handbooks: {
-          api: `${BASE_API}/courses/handbooks/`,
-          title: 'Discipleship Courses',
-        },
         series: {
           api: `${BASE_API}/courses/vbsify-series/`,
           title: "VBSify Series",
+        },
+        handbooks: {
+          api: `${BASE_API}/courses/handbooks/`,
+          title: 'Discipleship Courses',
         },
       };
 
@@ -2368,6 +2368,7 @@
     }
 
     renderSubscriptions(subscriptions) {
+
       if (!this.subscriptionSection) return;
 
       const subscriptionGrid = this.subscriptionSection.querySelector(
@@ -2700,8 +2701,6 @@
     // Handle browser navigation (back/forward)
     window.addEventListener("popstate", initialize);
   }
-
-  console.log("macCommunityData", window.macCommunityData);
 
   // Return public API
   return {

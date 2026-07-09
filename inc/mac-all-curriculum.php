@@ -30,13 +30,13 @@ function mac_get_all_course_types()
             'api' => 'https://api.markandrewscreative.com/api/v1/courses/bible-stories/',
             'title' => 'Bible Stories',
         ],
-        'handbooks' => [
-            'api' => 'https://api.markandrewscreative.com/api/v1/courses/handbooks/',
-            'title' => 'Discipleship Courses',
-        ],
         'vseries' => [
             'api' => 'https://api.markandrewscreative.com/api/v1/courses/vbsify-series/',
             'title' => 'Vbsify Stories',
+        ],
+        'handbooks' => [
+            'api' => 'https://api.markandrewscreative.com/api/v1/courses/handbooks/',
+            'title' => 'Discipleship Courses',
         ],
     ];
 }
