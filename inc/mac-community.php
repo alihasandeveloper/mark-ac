@@ -58,16 +58,33 @@ function mac_create_community_post()
 {
     check_ajax_referer('mac_community_nonce', 'nonce');
 
-    $title = isset($_POST['email']) ? sanitize_text_field($_POST['email']) : '';
+    $title = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
 
     if (empty($title)) {
-        wp_send_json_error(array('message' => 'Please provide your email to join the community.'));
+        wp_send_json_error(array('message' => 'Something went wrong. Please provide a valid email address.'));
     }
 
-    // Check if post already exists
-    $existing_post = get_page_by_title($title, OBJECT, 'community');
-    if ($existing_post) {
-        wp_send_json_error(array('message' => 'This email is already registered in our community!'));
+    // Send to external API
+    $api_url = BASE_API . '/resources/admin/free-resource/send-free-resource/';
+    $response = wp_remote_post($api_url, array(
+        'method' => 'POST',
+        'timeout' => 15,
+        'headers' => array(
+            'Content-Type' => 'application/json',
+        ),
+        'body' => json_encode(array(
+            'email' => $title,
+        )),
+    ));
+
+    if (is_wp_error($response)) {
+        wp_send_json_error(array('message' => 'Something went wrong. Please try again in a moment.'));
+    }
+
+    $response_code = wp_remote_retrieve_response_code($response);
+
+    if ($response_code < 200 || $response_code >= 300) {
+        wp_send_json_error(array('message' => 'Something went wrong. Please try again later.'));
     }
 
     $post_id = wp_insert_post(array(
@@ -77,11 +94,13 @@ function mac_create_community_post()
     ));
 
     if (is_wp_error($post_id)) {
-        wp_send_json_error(array('message' => 'We encountered an issue while adding you to the community. Please try again.'));
+        wp_send_json_error(array('message' => 'Something went wrong. Please try again.'));
     }
 
-    wp_send_json_success(array('message' => 'Congratulations! You are now part of our community.'));
+    wp_send_json_success(array('message' => 'You have successfully joined our community!'));
 }
+
+
 add_action('wp_ajax_mac_create_community_post', 'mac_create_community_post');
 add_action('wp_ajax_nopriv_mac_create_community_post', 'mac_create_community_post');
 
