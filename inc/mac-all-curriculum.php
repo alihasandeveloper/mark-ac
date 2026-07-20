@@ -36,7 +36,7 @@ function mac_get_all_course_types()
         ],
         'handbooks' => [
             'api' => 'https://api.markandrewscreative.com/api/v1/courses/handbooks/',
-            'title' => 'Discipleship Courses',
+            'title' => 'Bible Lab',
         ],
     ];
 }

@@ -243,7 +243,7 @@
         },
         handbooks: {
           api: "https://api.markandrewscreative.com/api/v1/courses/handbooks/",
-          title: "Discipleship Courses",
+          title: "Bible Lab",
         },
       };
 
@@ -1183,7 +1183,7 @@
         },
         handbooks: {
           api: `${BASE_API}/courses/handbooks/`,
-          title: 'Discipleship Courses',
+          title: 'Bible Lab',
         },
       };
 
