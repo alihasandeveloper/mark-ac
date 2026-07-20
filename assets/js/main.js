@@ -905,7 +905,7 @@
       const displayTags = course.tags ? course.tags.slice(0, 3) : [];
 
       // const courseUrl = `/products?scope=${typeKey}&id=${course.id}&selected=${encodeURIComponent(course.title)}`;
-      const courseUrl = `/resources/${course.slug}?scope=${typeKey}&id=${course.id}`;
+      const courseUrl = `/library/${course.slug}?scope=${typeKey}&id=${course.id}`;
 
       return `
             <a href="${courseUrl}" class="curriculum-card-link">
