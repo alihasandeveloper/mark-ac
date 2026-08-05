@@ -3,7 +3,8 @@
  * Register Mac Resource Carousel Block
  */
 
-function mac_register_resource_carousel_block() {
+function mac_register_resource_carousel_block()
+{
     // Register the block script
     wp_register_script(
         'mac-resource-carousel-editor',
@@ -48,29 +49,78 @@ add_action('init', 'mac_register_resource_carousel_block');
 /**
  * Render callback for the block
  */
-function mac_render_resource_carousel_block($attributes) {
-    $slides = isset($attributes['slides']) ? $attributes['slides'] : array();
-    
-    if (empty($slides)) {
+function mac_render_resource_carousel_block($attributes)
+{
+    $static_slides = isset($attributes['slides']) ? $attributes['slides'] : array();
+
+    if (empty($static_slides)) {
         return '';
     }
+
+    $api = "https://api.markandrewscreative.com/api/v1/courses/public/featured-courses/";
+
+    $response = wp_remote_get($api, array(
+        'timeout' => 15,
+    ));
+
+    if (is_wp_error($response)) {
+        return '';
+    }
+
+    $body = wp_remote_retrieve_body($response);
+    $data = json_decode($body, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE || !is_array($data)) {
+        return '';
+    }
+
+    $results = $data['results'] ?? [];
+
+    $slides = [];
+
+    if (!empty($static_slides)) {
+        $slides[] = [
+            'title' => $static_slides[0]['linkText'] ?? '',
+            'type' => 'course',
+            'scope' => 'bible-image',
+            'image' => $static_slides[0]['imageUrl'] ?? '',
+            'slug' => $static_slides[0]['linkUrl'] ?? '',
+        ];
+    }
+
+   if (!empty($results)) {
+    foreach ($results as $result) {
+        $slides[] = [
+            'title' => $result['title'] ?? '',
+            'type' => $result['type'] ?? '',
+            'scope' => $result['scope'] ?? '',
+            'course_id' => ($result['type'] ?? '') === 'course'
+                ? ($result['course_id'] ?? '')
+                : (($result['type'] ?? '') === 'tier'
+                    ? ($result['tier']['id'] ?? '')
+                    : ''),
+            'image' => $result['course']['image'] ?? $result['tier']['image'] ?? '',
+            'slug' => $result['course']['slug'] ?? $result['tier']['slug'] ?? '',
+        ];
+    }
+}
 
     ob_start();
     ?>
     <div class="mac-resource-carousel-wrapper">
         <div class="carousel">
             <div class="carousel-track">
-                <?php foreach ($slides as $index => $slide): ?>
+                <?php foreach ($slides as $index => $slide):
+                    $slide_url = mac_dynamic_url_changer($slide['slug'] ?? '', $slide['scope'] ?? '', $slide['course_id'] ?? '', $slide['type'] ?? '');
+                    ?>
                     <div class="carousel-slide" style="--slide-index: <?php echo esc_attr($index); ?>;">
-                        <?php if (!empty($slide['imageUrl'])): ?>
-                            <img
-                                src="<?php echo esc_url($slide['imageUrl']); ?>"
-                                alt="<?php echo esc_attr($slide['linkText'] ?? 'Slide ' . ($index + 1)); ?>"
-                            />
+                        <?php if (!empty($slide['image'])): ?>
+                            <img src="<?php echo esc_url($slide['image']); ?>"
+                                alt="<?php echo esc_attr($slide['title'] ?? 'Slide ' . ($index + 1)); ?>" />
                         <?php endif; ?>
-                        <?php if (!empty($slide['linkText']) && !empty($slide['linkUrl'])): ?>
-                            <a href="<?php echo esc_url($slide['linkUrl']); ?>" class="slide-button">
-                                <?php echo esc_html($slide['linkText']); ?>
+                        <?php if (!empty($slide['title']) && !empty($slide_url)): ?>
+                            <a href="<?php echo esc_url($slide_url); ?>" class="slide-button">
+                                <?php echo esc_html($slide['title']); ?>
                             </a>
                         <?php endif; ?>
                     </div>
@@ -80,4 +130,34 @@ function mac_render_resource_carousel_block($attributes) {
     </div>
     <?php
     return ob_get_clean();
+}
+
+
+function mac_dynamic_url_changer($slug = '', $scope = '', $course_id = '', $type = '')
+{
+    if (empty($slug)) {
+        return '';
+    }
+    if ($type === 'course') {
+        if ($scope === 'bible-image') {
+            return $slug;
+        } elseif ($scope === 'vbsify_series') {
+            return '/library/' . rawurlencode($slug) . '?scope=series&id=' . rawurlencode($course_id);
+        } elseif ($scope === 'handbooks') {
+            return '/library/' . rawurlencode($slug) . '?scope=handbooks&id=' . rawurlencode($course_id);
+        } elseif ($scope === 'bible_stories') {
+            return '/library/' . rawurlencode($slug) . '?scope=stories&id=' . rawurlencode($course_id);
+        }
+    } elseif ($type === 'tier') {
+        if ($scope === 'vbsify_series') {
+            return '/curriculum/' . '?scope=series&tierId=' . rawurlencode($course_id);
+        } elseif ($scope === 'handbooks') {
+            return '/curriculum/' . '?scope=handbooks&tierId=' . rawurlencode($course_id);
+        } elseif ($scope === 'bible_stories') {
+            return '/curriculum/' . '?scope=stories&tierId=' . rawurlencode($course_id);
+        }
+    }
+
+
+    return '/library/' . rawurlencode($slug) . (!empty($scope) ? '?scope=' . rawurlencode($scope) : '') . (!empty($course_id) ? '&id=' . rawurlencode($course_id) : '');
 }

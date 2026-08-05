@@ -1,4 +1,4 @@
-(function() {
+(function () {
     'use strict';
 
     // Wait for DOM to be ready
@@ -10,8 +10,8 @@
 
     function initCarousels() {
         const carouselWrappers = document.querySelectorAll('.mac-resource-carousel-wrapper');
-        
-        carouselWrappers.forEach(function(wrapper) {
+
+        carouselWrappers.forEach(function (wrapper) {
             initCarousel(wrapper);
         });
     }
@@ -43,7 +43,7 @@
 
         // Initialize
         function init() {
-            items.forEach(function(item) {
+            items.forEach(function (item) {
                 item.style.position = 'absolute';
                 item.style.left = '50%';
                 item.style.top = '50%';
@@ -55,6 +55,7 @@
             state.targetScroll = 0;
 
             update();
+            wrapper.style.visibility = 'visible';
             addEventListeners();
 
             window.addEventListener('resize', handleResize);
@@ -101,7 +102,7 @@
                 }
             }
 
-            items.forEach(function(item, index) {
+            items.forEach(function (item, index) {
                 const itemBaseOffset = index * state.itemSpacing;
 
                 let visualOffset = (itemBaseOffset + state.currentScroll) % state.totalWidth;
@@ -185,7 +186,7 @@
             window.addEventListener('touchmove', handleMove, { passive: false });
             window.addEventListener('touchend', handleEnd);
 
-            document.body.addEventListener('mouseleave', function() {
+            document.body.addEventListener('mouseleave', function () {
                 if (state.isDragging) {
                     state.isDragging = false;
                     snapToNearest();

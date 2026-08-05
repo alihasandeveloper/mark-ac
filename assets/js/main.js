@@ -1348,7 +1348,7 @@
 
       const firstCollection = course.collections?.[0]; // Optional chaining
       const displayTags = course.tags?.slice(0, 3) || []; // Optional chaining + fallback
-      const courseUrl = `/resources/${course.slug}?scope=${encodeURIComponent(this.currentCourseType)}&id=${encodeURIComponent(course.id)}`;
+      const courseUrl = `/library/${course.slug}?scope=${encodeURIComponent(this.currentCourseType)}&id=${encodeURIComponent(course.id)}`;
 
       return `
                 <a href="${courseUrl}" class="curriculum-card-link" aria-label="View ${this.escapeHtml(course.title, true)}">
