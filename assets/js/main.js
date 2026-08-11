@@ -697,20 +697,11 @@
     }
 
     applyClientFilters(coursesData, filters) {
-      if (!filters.search) return coursesData;
-
-      // Apply search filter on client side
-      return coursesData.map((section) => ({
-        ...section,
-        courses: section.courses.filter((course) => {
-          const searchLower = filters.search.toLowerCase();
-          return (
-            course.title.toLowerCase().includes(searchLower) ||
-            (course.description &&
-              course.description.toLowerCase().includes(searchLower))
-          );
-        }),
-      }));
+      // Search filtering is handled server-side via API query params.
+      // Applying a second client-side search filter would incorrectly drop
+      // results where the match is in lesson content rather than the title
+      // or short description (e.g. searching "oxen" returns Elijah/Elisha).
+      return coursesData;
     }
 
     buildCourseSectionHTML(typeKey, typeTitle, courses) {
