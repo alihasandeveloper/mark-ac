@@ -813,7 +813,7 @@
 
           const originalSlides = swiperEl.querySelectorAll(".swiper-wrapper > .swiper-slide");
           const slideCount = originalSlides.length;
-          const shouldLoop = slideCount > 1;
+          const shouldLoop = slideCount > 3;
 
           if (shouldLoop) {
             this.prepareSwiperSlidesForLoop(swiperEl, 9);
