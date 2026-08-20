@@ -21,6 +21,9 @@
             radius: 800,
             visibleItems: 5,
         };
+        const prevBtn = wrapper.querySelector('.carousel-prev');
+        const nextBtn = wrapper.querySelector('.carousel-next');
+
 
         // State
         let state = {
@@ -40,6 +43,27 @@
         const itemCount = items.length;
 
         if (!track || itemCount === 0) return;
+
+        // Navigate function
+        function navigate(direction) {
+            const currentIndex = Math.round(-state.currentScroll / state.itemSpacing);
+            const targetIndex = currentIndex + direction;
+            state.targetScroll = -targetIndex * state.itemSpacing;
+            state.isSnapping = true;
+        }
+
+        // Click events for prev and next buttons
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function () {
+                navigate(-1); // Prev slide
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function () {
+                navigate(1); // Next slide
+            });
+        }
+
 
         // Initialize
         function init() {

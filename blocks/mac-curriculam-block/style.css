@@ -302,6 +302,14 @@ a.curriculum-card-link {
 .card-content {
     padding-top: 16px;
 }
+.card-content h3 {
+    display: flex;
+    flex-direction: column-reverse;
+}
+.total-lessons {
+    font-size: 13px;
+    font-weight: 500;
+}
 
 .card-author {
     display: flex;

@@ -224,14 +224,7 @@ function mac_render_all_courses($courses, $type_key)
                         <?php echo esc_html($course['title']); ?>
                     </a>
                 </h3>
-                <div class="card-tags">
-                    <?php
-                    $tags = array_slice($course['tags'], 0, 3);
-                    foreach ($tags as $tag):
-                        ?>
-                        <span class="tag"><?php echo esc_html($tag['title']); ?></span>
-                    <?php endforeach; ?>
-                </div>
+
             </div>
         </div>
     <?php endforeach;

@@ -260,7 +260,7 @@
         tags: [],
       };
 
-      // Dynamic Filter State
+      // Dynamic Filter State (for sidebar filter options: Collections, Characters)
       this.filterState = {
         collections: {
           page: 1,
@@ -275,6 +275,21 @@
           items: [],
         },
       };
+
+      // [LAZY LOAD CHANGE START] — Block 1: courseState added to constructor
+      // -----------------------------------------------------------------------
+      // LAZY LOAD PAGINATION STATE (added for infinite slider pagination)
+      // Tracks the current API page, next-page URL, loading flag, and the full
+      // accumulated list of courses for each course type (stories/series/handbooks).
+      // When the user slides near the end of the loaded slides, the next page is
+      // fetched and appended to the Swiper without reloading the whole block.
+      // -----------------------------------------------------------------------
+      this.courseState = {
+        stories:  { page: 1, next: null, loading: false, items: [] },
+        series:   { page: 1, next: null, loading: false, items: [] },
+        handbooks:{ page: 1, next: null, loading: false, items: [] },
+      };
+      // [LAZY LOAD CHANGE END] — Block 1
     }
 
     init() {
@@ -454,24 +469,52 @@
       }
     }
 
+    // [LAZY LOAD CHANGE START] — Block 2: fetchAllCourses updated to populate courseState
     async fetchAllCourses(filters) {
+      // -----------------------------------------------------------------------
+      // UPDATED: fetchAllCourses now calls the updated fetchCoursesFromAPI which
+      // returns the full API response (results + next link). The first-page state
+      // is stored in this.courseState so the lazy-loader knows where to continue.
+      // Previously: only returned data.results (array). Now: returns full data object.
+      // -----------------------------------------------------------------------
       const promises = Object.entries(this.courseTypes).map(
         async ([typeKey, typeInfo]) => {
-          const courses = await this.fetchCoursesFromAPI(typeInfo.api, filters);
+          // Fetch page 1 with current filters
+          const data = await this.fetchCoursesFromAPI(typeInfo.api, filters, 1);
+
+          // Store pagination state for this course type so lazy loading can continue
+          this.courseState[typeKey].page    = 1;
+          this.courseState[typeKey].next    = data.next || null;
+          this.courseState[typeKey].items   = data.results || [];
+          this.courseState[typeKey].loading = false;
+          this.courseState[typeKey].api     = typeInfo.api;
+
           return {
-            type: typeKey,
-            title: typeInfo.title,
-            courses: courses,
+            type:    typeKey,
+            title:   typeInfo.title,
+            courses: data.results || [],
           };
         },
       );
 
       return await Promise.all(promises);
     }
+    // [LAZY LOAD CHANGE END] — Block 2
 
-    async fetchCoursesFromAPI(apiUrl, filters = {}) {
+    // [LAZY LOAD CHANGE START] — Block 3: fetchCoursesFromAPI updated (page param + full response)
+    // -------------------------------------------------------------------------
+    // UPDATED: fetchCoursesFromAPI now accepts a `page` parameter (default: 1)
+    // and returns the FULL API response object { count, next, previous, results }
+    // instead of just data.results.
+    // Reason: The lazy-load system needs the `next` URL from the response to know
+    // whether another page of courses exists before triggering the next fetch.
+    // -------------------------------------------------------------------------
+    async fetchCoursesFromAPI(apiUrl, filters = {}, page = 1) {
       // Build query parameters
       const params = new URLSearchParams();
+
+      // Include the page number so the API returns the correct batch of results
+      params.set("page", page);
 
       if (filters.search) {
         params.set("search", filters.search);
@@ -489,7 +532,7 @@
         params.set("tags", filters.tags.join(","));
       }
 
-      const url = params.toString() ? `${apiUrl}?${params.toString()}` : apiUrl;
+      const url = `${apiUrl}?${params.toString()}`;
 
       try {
         const response = await fetch(url);
@@ -497,12 +540,18 @@
           throw new Error(`API request failed: ${response.status}`);
         }
         const data = await response.json();
-        return data.results || [];
+
+        // Previously returned only data.results. Now returns full object so callers
+        // can read data.next to determine if another page exists.
+        // Old: return data.results || [];
+        return data;
       } catch (error) {
         console.error("Error fetching from API:", apiUrl, error);
-        return [];
+        // Return an empty response shape so callers don't break
+        return { count: 0, next: null, previous: null, results: [] };
       }
     }
+    // [LAZY LOAD CHANGE END] — Block 3
 
     async loadDynamicFilters(type, append = false) {
       if (this.filterState[type].loading) return;
@@ -727,7 +776,7 @@
         return `
             <div class="course-section" data-section="${typeKey}">
                 <div class="section-header">
-                    <h6>${this.escapeHtml(typeTitle)} <span>${count}</span></h6>
+                    <h6>${this.escapeHtml(typeTitle)}</h6>
                     <div class="section-header-right">
                         ${seeAllLink}
                     </div>
@@ -766,6 +815,99 @@
       });
       this.swiperInstances = [];
     }
+
+    // [LAZY LOAD CHANGE START] — Block 4: bindSwiperLazyLoadEvent + loadNextCoursePage (both new functions)
+    // =========================================================================
+    // LAZY LOAD - bindSwiperLazyLoadEvent
+    // =========================================================================
+    // Listens to Swiper's `slideChange` event for a given section (typeKey).
+    // When the user's real slide index is within 3 slides of the total number
+    // of unique course items already loaded, we trigger a fetch for the next
+    // page from the API. This gives a seamless infinite-scroll feel inside the
+    // slider without the user noticing any loading gap.
+    // If the API has no more pages (next === null), nothing is fetched and the
+    // existing Swiper loop continues repeating the loaded courses as before.
+    // =========================================================================
+    bindSwiperLazyLoadEvent(swiper, typeKey) {
+      swiper.on("slideChange", () => {
+        const state = this.courseState[typeKey];
+
+        // Do not fetch if: already loading, no more pages, or not in slider mode
+        if (state.loading || !state.next || this.layout !== "slider") return;
+
+        const totalLoaded   = state.items.length;
+        const currentIndex  = swiper.realIndex; // real index ignores loop duplicates
+        const slidesVisible = swiper.params.slidesPerView || 1;
+
+        // Trigger fetch when the user is within 3 slides of the end of loaded content
+        const triggerThreshold = totalLoaded - slidesVisible - 3;
+        if (currentIndex >= triggerThreshold) {
+          this.loadNextCoursePage(typeKey, swiper);
+        }
+      });
+    }
+
+    // =========================================================================
+    // LAZY LOAD - loadNextCoursePage
+    // =========================================================================
+    // Fetches the next page of courses for the given course type from the API,
+    // appends the new slide HTML directly into the live Swiper wrapper, then
+    // updates the Swiper instance so it recognises the new slides.
+    // Strategy: Instead of destroy + rebuild (which causes a visible flash),
+    // we use swiper.appendSlide() which appends slides while keeping the user
+    // at their current position. After appending we call swiper.update() to
+    // let Swiper recalculate its internal layout.
+    // =========================================================================
+    async loadNextCoursePage(typeKey, swiperInstance) {
+      const state = this.courseState[typeKey];
+
+      // Guard: prevent concurrent fetches for the same section
+      if (state.loading || !state.next) return;
+
+      state.loading = true;
+      console.log(`[CurriculumLazyLoad] Fetching next page for "${typeKey}" (page ${state.page + 1})`);
+
+      try {
+        const nextPage = state.page + 1;
+
+        // Fetch the next page using current filters so search/character filters are respected
+        const data = await this.fetchCoursesFromAPI(
+          state.api,
+          this.currentFilters,
+          nextPage
+        );
+
+        const newCourses = data.results || [];
+
+        if (newCourses.length === 0) {
+          // API returned empty results even though `next` was set – treat as final page
+          state.next = null;
+          console.log(`[CurriculumLazyLoad] No results on page ${nextPage} for "${typeKey}". Stopping.`);
+          return;
+        }
+
+        // Update state with the new page info
+        state.page  = nextPage;
+        state.next  = data.next || null;
+        state.items = [...state.items, ...newCourses];
+
+        // Build slide HTML for each new course and append into the live Swiper
+        newCourses.forEach((course) => {
+          const slideHTML = `<div class="swiper-slide">${this.buildCourseCardHTML(typeKey, course)}</div>`;
+          swiperInstance.appendSlide(slideHTML);
+        });
+
+        // Let Swiper recalculate now that new slides are in the DOM
+        swiperInstance.update();
+
+        console.log(`[CurriculumLazyLoad] Appended ${newCourses.length} new slides for "${typeKey}". Next page: ${state.next ? 'yes' : 'no (end of data)'}`);
+      } catch (error) {
+        console.error(`[CurriculumLazyLoad] Failed to load next page for "${typeKey}":`, error);
+      } finally {
+        state.loading = false;
+      }
+    }
+    // [LAZY LOAD CHANGE END] — Block 4
 
     prepareSwiperSlidesForLoop(swiperEl, minCount = 9) {
       const wrapper = swiperEl.querySelector(".swiper-wrapper");
@@ -858,6 +1000,19 @@
             },
           });
 
+          // [LAZY LOAD CHANGE START] — Block 5: bindSwiperLazyLoadEvent called inside initCurriculumSwipers
+          // -------------------------------------------------------------------
+          // LAZY LOAD: After the Swiper is initialised, read which course type
+          // this section belongs to (via data-section attribute) and bind the
+          // slideChange listener that will trigger fetching the next page when
+          // the user slides close to the end of the currently loaded courses.
+          // -------------------------------------------------------------------
+          const typeKey = section.dataset.section;
+          if (typeKey && this.courseState[typeKey]) {
+            this.bindSwiperLazyLoadEvent(swiper, typeKey);
+          }
+          // [LAZY LOAD CHANGE END] — Block 5
+
           this.swiperInstances.push(swiper);
         });
 
@@ -906,10 +1061,7 @@
                         ${firstCollection ? `<span class="card-badge">${this.escapeHtml(firstCollection.title)}</span>` : ""}
                     </div>
                     <div class="card-content">
-                        <h3 class="card-title">${this.escapeHtml(course.title)}</h3>
-                        <div class="card-tags">
-                            ${displayTags.map((tag) => `<span class="tag">${this.escapeHtml(tag.title)}</span>`).join("")}
-                        </div>
+                        <h3 class="card-title">${this.escapeHtml(course.title)} ${course.total_lessons ? `<span class="total-lessons">${course.total_lessons} Lessons</span>` : ''}</h3>
                     </div>
                 </div>
             </a>
@@ -1358,21 +1510,8 @@
                         </div>
                         <div class="card-content">
                             <h3 class="card-title">
-                                ${this.escapeHtml(course.title)}
+                                ${this.escapeHtml(course.title)}  ${course.total_lessons ? `<span class="total-lessons">${course.total_lessons} Lessons</span>` : ''}
                             </h3>
-                            ${displayTags.length > 0
-          ? `
-                            <div class="card-tags" role="list">
-                                ${displayTags
-            .map(
-              (tag) =>
-                `<span class="tag" role="listitem">${this.escapeHtml(tag.title)}</span>`,
-            )
-            .join("")}
-                            </div>
-                            `
-          : ""
-        }
                         </div>
                     </div>
                 </a>

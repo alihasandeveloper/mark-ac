@@ -109,6 +109,9 @@ function mac_render_resource_carousel_block($attributes)
     ?>
     <div class="mac-resource-carousel-wrapper">
         <div class="carousel">
+            <button class="carousel-prev" type="button" aria-label="Previous slide">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
             <div class="carousel-track">
                 <?php foreach ($slides as $index => $slide):
                     $slide_url = mac_dynamic_url_changer($slide['slug'] ?? '', $slide['scope'] ?? '', $slide['course_id'] ?? '', $slide['type'] ?? '');
@@ -126,6 +129,9 @@ function mac_render_resource_carousel_block($attributes)
                     </div>
                 <?php endforeach; ?>
             </div>
+            <button class="carousel-next" type="button" aria-label="Next slide">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
         </div>
     </div>
     <?php
