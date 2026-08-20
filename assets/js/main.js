@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Universal Animation & Interaction Library
  * Compatible with both WordPress and Next.js environments
  *
@@ -1205,10 +1205,10 @@
 
     bindFilterToggles() {
       document.querySelectorAll(".filter-title").forEach((title) => {
+        if (title._clickHandler) {
+          title.removeEventListener("click", title._clickHandler);
+        }
         const handler = () => {
-          if (title._clickHandler) {
-            title.removeEventListener("click", title._clickHandler);
-          }
           title.classList.toggle("active");
           const options = title.nextElementSibling;
 
@@ -2788,11 +2788,17 @@
       instances.scrollAnimator = new ScrollAnimator();
       instances.scrollAnimator.init();
 
-      instances.curriculumFilter = new CurriculumFilter();
-      instances.curriculumFilter.init();
+      // Only initialize on WordPress (IsWordPress is set via functions.php)
+      if (window.IsWordPress) {
+        instances.curriculumFilter = new CurriculumFilter();
+        instances.curriculumFilter.init();
+      }
 
-      instances.allCoursesManager = new AllCoursesManager();
-      instances.allCoursesManager.init();
+      // Only initialize on WordPress (IsWordPress is set via functions.php)
+      if (window.IsWordPress) {
+        instances.allCoursesManager = new AllCoursesManager();
+        instances.allCoursesManager.init();
+      }
 
       // Initialize GSAP animations (skip if in Next.js app to avoid double init)
       if (!window.MAC_NEXT_APP) {
@@ -2807,8 +2813,10 @@
       // Initialize pricing carousel (returns cleanup function)
       instances.pricingCarouselCleanup = initPricingCarousel();
 
-      // Initialize curriculum products (returns cleanup function)
-      instances.curriculumProductsCleanup = initCurriculumProducts();
+      // Initialize curriculum products only on WordPress
+      if (window.IsWordPress) {
+        instances.curriculumProductsCleanup = initCurriculumProducts();
+      }
 
       // Initialize community form
       instances.communityForm = new CommunityFormManager();
