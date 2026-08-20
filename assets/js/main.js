@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Universal Animation & Interaction Library
  * Compatible with both WordPress and Next.js environments
  *
@@ -285,9 +285,9 @@
       // fetched and appended to the Swiper without reloading the whole block.
       // -----------------------------------------------------------------------
       this.courseState = {
-        stories:  { page: 1, next: null, loading: false, items: [] },
-        series:   { page: 1, next: null, loading: false, items: [] },
-        handbooks:{ page: 1, next: null, loading: false, items: [] },
+        stories: { page: 1, next: null, loading: false, items: [] },
+        series: { page: 1, next: null, loading: false, items: [] },
+        handbooks: { page: 1, next: null, loading: false, items: [] },
       };
       // [LAZY LOAD CHANGE END] — Block 1
     }
@@ -483,15 +483,15 @@
           const data = await this.fetchCoursesFromAPI(typeInfo.api, filters, 1);
 
           // Store pagination state for this course type so lazy loading can continue
-          this.courseState[typeKey].page    = 1;
-          this.courseState[typeKey].next    = data.next || null;
-          this.courseState[typeKey].items   = data.results || [];
+          this.courseState[typeKey].page = 1;
+          this.courseState[typeKey].next = data.next || null;
+          this.courseState[typeKey].items = data.results || [];
           this.courseState[typeKey].loading = false;
-          this.courseState[typeKey].api     = typeInfo.api;
+          this.courseState[typeKey].api = typeInfo.api;
 
           return {
-            type:    typeKey,
-            title:   typeInfo.title,
+            type: typeKey,
+            title: typeInfo.title,
             courses: data.results || [],
           };
         },
@@ -835,8 +835,8 @@
         // Do not fetch if: already loading, no more pages, or not in slider mode
         if (state.loading || !state.next || this.layout !== "slider") return;
 
-        const totalLoaded   = state.items.length;
-        const currentIndex  = swiper.realIndex; // real index ignores loop duplicates
+        const totalLoaded = state.items.length;
+        const currentIndex = swiper.realIndex; // real index ignores loop duplicates
         const slidesVisible = swiper.params.slidesPerView || 1;
 
         // Trigger fetch when the user is within 3 slides of the end of loaded content
@@ -887,8 +887,8 @@
         }
 
         // Update state with the new page info
-        state.page  = nextPage;
-        state.next  = data.next || null;
+        state.page = nextPage;
+        state.next = data.next || null;
         state.items = [...state.items, ...newCourses];
 
         // Build slide HTML for each new course and append into the live Swiper
@@ -1061,8 +1061,15 @@
                         ${firstCollection ? `<span class="card-badge">${this.escapeHtml(firstCollection.title)}</span>` : ""}
                     </div>
                     <div class="card-content">
-                        <h3 class="card-title">${this.escapeHtml(course.title)} ${course.total_lessons ? `<span class="total-lessons">${course.total_lessons} Lessons</span>` : ''}</h3>
-                    </div>
+
+                      <h3 class="card-title">
+                          ${this.escapeHtml(course.title)}
+                          ${course.total_lessons
+          ? `<span class="total-lessons">${course.total_lessons} ${Number(course.total_lessons) === 1 ? 'Lesson' : 'Lessons'}</span>`
+          : ''
+        }
+                      </h3>
+                       </div>
                 </div>
             </a>
             `;
@@ -1510,7 +1517,11 @@
                         </div>
                         <div class="card-content">
                             <h3 class="card-title">
-                                ${this.escapeHtml(course.title)}  ${course.total_lessons ? `<span class="total-lessons">${course.total_lessons} Lessons</span>` : ''}
+                                ${this.escapeHtml(course.title)}
+                                ${course.total_lessons
+          ? `<span class="total-lessons">${course.total_lessons} ${Number(course.total_lessons) === 1 ? 'Lesson' : 'Lessons'}</span>`
+          : ''
+        }
                             </h3>
                         </div>
                     </div>
